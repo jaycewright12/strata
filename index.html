@@ -728,6 +728,26 @@ body {
 .toggle-row input:focus-visible + .toggle-ui { outline: 3px solid var(--water); outline-offset: 2px; }
 .toggle-copy { display: flex; flex-direction: column; gap: 4px; }
 .toggle-copy span { color: var(--ink-soft); font-size: 14px; }
+.pack-list { display: grid; gap: 10px; margin-top: 14px; }
+.pack-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); }
+.pack-row.broken { border-color: var(--heart); }
+.pack-main { min-width: 0; }
+.pack-sub { color: var(--ink-soft); font-size: 13px; margin-top: 3px; overflow-wrap: anywhere; }
+.pack-ver { color: var(--ink-soft); font-size: 13px; font-weight: 600; }
+.pack-badge { display: inline-block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; border-radius: 999px; padding: 1px 8px; margin-left: 6px; vertical-align: 2px; }
+.pack-badge.builtin { background: var(--paper-2); color: var(--ink-soft); }
+.pack-badge.imported { background: var(--water); color: #fff; }
+.pack-badge.bad { background: var(--heart); color: #fff; }
+.btn-small { padding: 8px 14px; font-size: 14px; }
+.import-result { display: none; margin-top: 16px; padding: 14px 18px; border-radius: 16px; border: 2px solid var(--line); background: var(--card); }
+.import-result.show { display: block; }
+.import-result.good { border-color: var(--moss); }
+.import-result.bad { border-color: var(--heart); }
+.import-result h3 { font-family: var(--font-display); margin-bottom: 6px; }
+.import-result p { color: var(--ink-soft); }
+.issue-head { font-weight: 700; margin-top: 10px; font-size: 14px; }
+.issues { margin: 4px 0 0 18px; font-size: 13px; color: var(--ink-soft); }
+.issues code { font-size: 12px; overflow-wrap: anywhere; }
 .pack-tag { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--water); border: 1px solid var(--water); border-radius: 999px; padding: 2px 10px; margin-bottom: 6px; }
 @media (max-width: 560px) {
   .two-btns { grid-template-columns: 1fr; }
@@ -1380,7 +1400,7 @@ body {
     if (to === "review") return renderReview();
     if (to === "lesson") return startLesson(payload);
     if (to === "tutor") return renderTutor();
-    if (to === "settings") return renderSettings();
+    if (to === "settings") return renderSettings(payload);
     if (to === "mixed") return startMixed();
   }
 
@@ -2078,7 +2098,96 @@ body {
     return String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;");
   }
 
-  function renderSettings() {
+  /* ---------- Settings › Question packs (import / list / remove) ---------- */
+  const esc = (v) => escapeHtml(v == null ? "" : v);
+  function countsText(c) {
+    const pl = (n, w) => n + " " + w + (n === 1 ? "" : "s");
+    return [pl(c.units, "unit"), pl(c.lessons, "lesson"), pl(c.items, "question") + (c.peItems ? " (" + c.peItems + " PE bench)" : ""),
+      c.figs ? pl(c.figs, "figure") : "", c.reference ? pl(c.reference, "reference card") : "", c.variables ? pl(c.variables, "glossary entry").replace("entrys", "entries") : ""]
+      .filter(Boolean).join(" · ");
+  }
+  function issuesHtml(res) {
+    const rej = res.rejected || [], warn = res.warnings || [];
+    return (rej.length ? `<div class="issue-head">Rejected (${rej.length})</div><ul class="issues">${rej.map((r) => `<li><code>${esc(r.where)}</code> — ${esc(r.reason)}</li>`).join("")}</ul>` : "") +
+      (warn.length ? `<div class="issue-head">Warnings (${warn.length})</div><ul class="issues">${warn.map((w) => `<li>${esc(w)}</li>`).join("")}</ul>` : "");
+  }
+  function packsSectionHtml(flash) {
+    const b = window.STRATA.lastBuild || { reg: { packs: [] }, failedImports: [] };
+    const rows = b.reg.packs.map((p) => `
+      <div class="pack-row" data-pack="${esc(p.id)}">
+        <div class="pack-main">
+          <strong>${p.title}</strong> <span class="pack-ver">v${p.version}</span>
+          <span class="pack-badge ${p.builtin ? "builtin" : "imported"}">${p.builtin ? "Built-in" : "Imported"}</span>
+          <div class="pack-sub">${esc(countsText(p.counts))}${p.meta && p.meta.file ? " · " + esc(p.meta.file) : ""}${(p.rejected.length ? " · " + p.rejected.length + " item(s) skipped" : "")}</div>
+        </div>
+        ${p.builtin ? "" : `<button class="btn btn-ghost btn-small" type="button" data-remove-pack="${esc(p.id)}">Remove</button>`}
+      </div>`).join("");
+    const broken = (b.failedImports || []).map((f) => `
+      <div class="pack-row broken">
+        <div class="pack-main"><strong>${esc(f.title || f.id)}</strong> <span class="pack-badge bad">Not loaded</span><div class="pack-sub">${esc(f.error)}</div></div>
+        <button class="btn btn-ghost btn-small" type="button" data-remove-pack="${esc(f.id)}">Remove</button>
+      </div>`).join("");
+    return `
+      <section class="splash settings-block" id="packs-section">
+        <div class="kicker">Content</div>
+        <h1>Question packs</h1>
+        <p class="lede">Built-in packs ship with the app. Import a pack file (<code>.json</code> or <code>.js</code> pack) to add units and lessons. Imported packs are saved in this browser and load on every start.</p>
+        <div class="pack-list">${rows}${broken}</div>
+        <input type="file" id="pack-file" accept=".json,.js,application/json,text/javascript" hidden />
+        <div class="cta-row" style="margin-top:16px">
+          <button class="btn btn-primary" id="import-pack" type="button">Import pack…</button>
+        </div>
+        <div id="import-result" class="import-result${flash ? " show " + flash.kind : ""}" role="status">${flash ? flash.html : ""}</div>
+      </section>`;
+  }
+  function importResultHtml(kind, title, body) {
+    return { kind, html: `<h3>${title}</h3>${body || ""}` };
+  }
+  async function importPackFile(file) {
+    if (!file) return;
+    let text;
+    if (file.size > 2 * 1024 * 1024) return renderSettings(importResultHtml("bad", "Import failed", `<p>${esc(file.name)} is larger than 2 MB.</p>`));
+    try { text = await file.text(); }
+    catch (e) { return renderSettings(importResultHtml("bad", "Import failed", `<p>Could not read ${esc(file.name)}: ${esc(e.message)}</p>`)); }
+    let pv;
+    try { pv = window.STRATA.previewImport(text, file.name); }
+    catch (e) { return renderSettings(importResultHtml("bad", "Import failed", `<p>${esc(file.name)}: ${esc(e.message)}</p>`)); }
+    const res = pv.res;
+    if (!res.ok) {
+      return renderSettings(importResultHtml("bad", "Import failed", `<p>${esc(file.name)}: ${esc(res.error)}</p>${issuesHtml(res)}`));
+    }
+    if (pv.replacing && !window.confirm(`Replace the imported pack “${pv.replacing.title}” (v${pv.replacing.version}) with this file (v${pv.raw.version == null ? "1" : pv.raw.version})?`)) {
+      return renderSettings(importResultHtml("bad", "Import cancelled", `<p>The existing pack was kept.</p>`));
+    }
+    try { window.STRATA.saveImport(pv.raw, file.name); }
+    catch (e) { return renderSettings(importResultHtml("bad", "Import failed", `<p>Could not save the pack in this browser (${esc(e.name || e.message)}). Storage may be full.</p>`)); }
+    rebuildContent();
+    const first = res.pack.units[0] && res.pack.units[0].lessons[0];
+    renderSettings(importResultHtml("good", `${pv.replacing ? "Updated" : "Imported"} “${res.pack.title}” <span class="pack-ver">v${res.pack.version}</span>`,
+      `<p>Added ${esc(countsText(res.counts))}.</p>${issuesHtml(res)}
+       <div class="cta-row" style="margin-top:12px">
+         ${first ? `<button class="btn btn-primary" type="button" data-start-lesson="${esc(first.id)}">Start “${first.title}”</button>` : ""}
+         <button class="btn btn-ghost" type="button" data-go="home">See it on the path</button>
+       </div>`));
+  }
+  function bindPacksSection() {
+    const input = $("#pack-file");
+    $("#import-pack").addEventListener("click", () => input.click());
+    input.addEventListener("change", () => { const f = input.files && input.files[0]; input.value = ""; importPackFile(f); });
+    app.querySelectorAll("[data-remove-pack]").forEach((btn) => btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-remove-pack");
+      const entry = window.STRATA.readStore().packs.find((e) => e.id === id);
+      const name = entry ? entry.title : id;
+      if (!window.confirm(`Remove the pack “${name}”?\n\nIts lessons disappear from the path. Your saved progress on them is kept and comes back if you import the pack again.`)) return;
+      try { window.STRATA.removeImport(id); }
+      catch (e) { return renderSettings(importResultHtml("bad", "Remove failed", `<p>${esc(e.message)}</p>`)); }
+      rebuildContent();
+      renderSettings(importResultHtml("good", "Pack removed", `<p>“${esc(name)}” was removed.</p>`));
+    }));
+    app.querySelectorAll("[data-start-lesson]").forEach((btn) => btn.addEventListener("click", () => startLesson(btn.getAttribute("data-start-lesson"))));
+  }
+
+  function renderSettings(flash) {
     show("settings", `
       ${renderTop()}
       <section class="splash settings-block">
@@ -2090,6 +2199,7 @@ body {
           <span class="toggle-copy"><strong>Shuffle answer choices</strong><span>Mix the A–D order each time a question is shown, so you learn the answer and not its position. Grading is unaffected.</span></span>
         </label>
       </section>
+      ${packsSectionHtml(flash)}
       <section class="splash settings-block">
         <div class="kicker">Discussion</div>
         <h1>Ask-about-this</h1>
@@ -2104,6 +2214,8 @@ body {
         </div>
       </section>
     `);
+    bindPacksSection();
+    if (flash) { const r = $("#import-result"); if (r && r.scrollIntoView) r.scrollIntoView({ block: "center" }); }
     $("#shuffle-toggle").addEventListener("change", (e) => {
       state.shuffle = !!e.target.checked; // new optional field in strata-fepe-v1 (missing = on)
       save();
