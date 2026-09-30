@@ -2597,6 +2597,12 @@ window.STRATA_FIGS = {
     `;
   }
 
+  // Refresh every visible heart counter in place (top bar + lesson bar) without re-rendering the screen.
+  function paintHearts() {
+    app.querySelectorAll(".topbar .stat.hearts span").forEach((el) => { el.textContent = state.hearts; });
+    app.querySelectorAll(".lesson-top .stat.hearts").forEach((el) => { el.textContent = "❤ " + state.hearts; });
+  }
+
   function show(name, html) {
     app.innerHTML = html;
     app.dataset.screen = name;
@@ -2881,6 +2887,7 @@ window.STRATA_FIGS = {
       if (!session.examMode) state.hearts = Math.max(0, state.hearts - 1);
       if (!state.missed.includes(item.id)) state.missed.push(item.id);
       save();
+      paintHearts();
     }
     if (ok && session.reviewMode) {
       state.missed = state.missed.filter((id) => id !== item.id);
