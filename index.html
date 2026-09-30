@@ -718,6 +718,16 @@ body {
   background: #fff;
 }
 .settings-label { display: block; font-weight: 700; margin: 18px 0 6px; }
+.settings-block + .settings-block { margin-top: 18px; }
+.toggle-row { display: flex; align-items: flex-start; gap: 14px; margin-top: 16px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--card); cursor: pointer; }
+.toggle-row input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.toggle-ui { flex: 0 0 auto; width: 46px; height: 26px; border-radius: 999px; background: var(--locked); position: relative; transition: background .15s; margin-top: 2px; }
+.toggle-ui::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: left .15s; }
+.toggle-row input:checked + .toggle-ui { background: var(--moss); }
+.toggle-row input:checked + .toggle-ui::after { left: 23px; }
+.toggle-row input:focus-visible + .toggle-ui { outline: 3px solid var(--water); outline-offset: 2px; }
+.toggle-copy { display: flex; flex-direction: column; gap: 4px; }
+.toggle-copy span { color: var(--ink-soft); font-size: 14px; }
 .pack-tag { display: inline-block; font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--water); border: 1px solid var(--water); border-radius: 999px; padding: 2px 10px; margin-bottom: 6px; }
 @media (max-width: 560px) {
   .two-btns { grid-template-columns: 1fr; }
@@ -1505,6 +1515,41 @@ body {
     return a;
   }
 
+  /* ---------- answer shuffling ----------
+   * Display order is picked once per question per session (so the tutor/recap show the same order)
+   * and re-rolled the next time the question is shown. Grading always uses the choice id, never the position. */
+  const LETTERS = ["A", "B", "C", "D", "E"];
+  function shuffleOn() { return state.shuffle !== false; } // missing (old saves) = on
+  function orderedChoices(item) {
+    const choices = (item && item.choices) || [];
+    if (!session) return choices;
+    session.orders = session.orders || {};
+    const key = session.index + "|" + item.id;
+    let ids = session.orders[key];
+    if (!ids || ids.length !== choices.length) {
+      ids = choices.map((c) => c.id);
+      if (shuffleOn()) ids = shuffle(ids);
+      session.orders[key] = ids;
+    }
+    return ids.map((id) => choices.find((c) => c.id === id)).filter(Boolean);
+  }
+  function letterOf(item, choiceId) {
+    const i = orderedChoices(item).findIndex((c) => c.id === choiceId);
+    return i >= 0 ? LETTERS[i] : String(choiceId || "").toUpperCase();
+  }
+  // Keep letter references in explanations true after shuffling:
+  //   [[b]]            -> displayed letter of the choice with id "b"
+  //   "choice B", "(B)" -> B means the 2nd choice as authored; rewritten to its displayed letter
+  function fixLetters(text, item) {
+    if (!text || !item) return text;
+    const orig = item.choices || [];
+    const remap = (L) => { const c = orig[LETTERS.indexOf(L)]; return c ? letterOf(item, c.id) : L; };
+    return String(text)
+      .replace(/\[\[([A-Za-z0-9_-]{1,16})\]\]/g, (m, id) => (orig.some((c) => c.id === id) ? letterOf(item, id) : m))
+      .replace(/\b(choices?|options?|answers?|Choices?|Options?|Answers?)(\s+)([A-E])\b/g, (m, w, sp, L) => w + sp + remap(L))
+      .replace(/\(([A-E])\)/g, (m, L) => "(" + remap(L) + ")");
+  }
+
   function startMixed() {
     const picked = [];
     pathLessons().forEach((lesson) => {
@@ -1593,7 +1638,7 @@ body {
         ${figSvg(item) ? `<div class="diagram"><span class="diagram-label">Figure</span>${figSvg(item)}</div>` : ""}
         <h2>${item.stem}</h2>
         <div class="choices">
-          ${item.choices.map((c, i) => `
+          ${orderedChoices(item).map((c, i) => `
             <button class="choice" type="button" data-choice="${c.id}">
               <span class="choice-key">${letters[i]}</span>${c.text}
             </button>
@@ -1652,10 +1697,10 @@ body {
     sheet.className = "sheet open " + (ok ? "good" : "bad");
     sheet.innerHTML = `
       <h3>${ok ? "Solid." : "Not that one."}</h3>
-      <p>${item.explanation}</p>
-      ${item.work && item.work.length ? `<ol class="work">${item.work.map((s) => `<li>${s}</li>`).join("")}</ol>` : ""}
-      ${!ok && item.miss ? `<p class="why">${item.miss}</p>` : ""}
-      ${item.fepe ? `<div class="fepe">${item.fepe}</div>` : ""}
+      <p>${fixLetters(item.explanation, item)}</p>
+      ${item.work && item.work.length ? `<ol class="work">${item.work.map((s) => `<li>${fixLetters(s, item)}</li>`).join("")}</ol>` : ""}
+      ${!ok && item.miss ? `<p class="why">${fixLetters(item.miss, item)}</p>` : ""}
+      ${item.fepe ? `<div class="fepe">${fixLetters(item.fepe, item)}</div>` : ""}
       <div class="check-wrap two-btns">
         <button class="btn btn-ghost" id="ask-btn" type="button">Ask about this</button>
         <button class="btn btn-primary" id="next-btn" type="button">${session.index + 1 >= session.lesson.items.length ? "See results" : "Continue"}</button>
@@ -1774,18 +1819,18 @@ body {
 
   function itemPack(item) {
     const correct = (item.choices || []).find((c) => c.correct) || {};
-    const letters = { a: "A", b: "B", c: "C", d: "D", e: "E" };
+    // Letters follow the order the learner actually saw (choices may be shuffled).
     return {
       stem: item.stem || "",
       vignette: item.vignette || "",
       given: item.given || "",
-      explanation: item.explanation || "",
-      miss: item.miss || "",
-      work: item.work || [],
-      fepe: item.fepe || "",
+      explanation: fixLetters(item.explanation || "", item),
+      miss: fixLetters(item.miss || "", item),
+      work: (item.work || []).map((s) => fixLetters(s, item)),
+      fepe: fixLetters(item.fepe || "", item),
       correctText: correct.text || "",
-      correctId: letters[correct.id] || "",
-      choices: (item.choices || []).map((c) => `${letters[c.id] || c.id}. ${c.text}${c.correct ? "  [correct]" : ""}`)
+      correctId: correct.id ? letterOf(item, correct.id) : "",
+      choices: orderedChoices(item).map((c, i) => `${LETTERS[i]}. ${c.text}${c.correct ? "  [correct]" : ""}`)
     };
   }
 
@@ -1804,7 +1849,7 @@ body {
       : `The keyed answer is ${p.correctId}: ${p.correctText}.`);
 
     if (letterHit) {
-      const ch = (item.choices || []).find((c) => c.id === letterHit[1]);
+      const ch = orderedChoices(item)[LETTERS.indexOf(letterHit[1].toUpperCase())];
       if (ch && !ch.correct) {
         bits.push(`Choice ${letterHit[1].toUpperCase()} (“${ch.text}”) is a distractor. ${p.miss || "It usually comes from stopping one step early — total stress, pore pressure alone, or the wrong coefficient."}`);
       } else if (ch && ch.correct) {
@@ -1848,7 +1893,7 @@ body {
       p.given ? "Given: " + p.given : "",
       "Choices:\n" + p.choices.join("\n"),
       "Keyed answer: " + p.correctId + " — " + p.correctText,
-      "Learner picked " + String(pickedId || "").toUpperCase() + " (" + (wasRight ? "correct" : "incorrect") + ").",
+      "Learner picked " + letterOf(item, pickedId) + " (" + (wasRight ? "correct" : "incorrect") + ").",
       "Official explanation: " + p.explanation,
       p.work.length ? "Worked steps:\n- " + p.work.join("\n- ") : "",
       p.miss ? "Common miss: " + p.miss : "",
@@ -1992,8 +2037,8 @@ body {
         ${item.vignette ? `<div class="vignette"><span class="vignette-label">Scenario</span>${item.vignette}</div>` : ""}
         <h2>${item.stem}</h2>
         <div class="choices">
-          ${item.choices.map((c, i) => {
-            const letters = ["A", "B", "C", "D", "E"];
+          ${orderedChoices(item).map((c, i) => {
+            const letters = LETTERS;
             const cls = c.correct ? "choice correct" : (c.id === choiceId && !ok ? "choice wrong" : "choice");
             return `<button class="${cls}" type="button" disabled><span class="choice-key">${letters[i]}</span>${c.text}</button>`;
           }).join("")}
@@ -2001,9 +2046,9 @@ body {
       </article>
       <div class="sheet open ${ok ? "good" : "bad"}" id="sheet">
         <h3>${ok ? "Solid." : "Not that one."}</h3>
-        <p>${item.explanation}</p>
-        ${item.work && item.work.length ? `<ol class="work">${item.work.map((s) => `<li>${s}</li>`).join("")}</ol>` : ""}
-        ${!ok && item.miss ? `<p class="why">${item.miss}</p>` : ""}
+        <p>${fixLetters(item.explanation, item)}</p>
+        ${item.work && item.work.length ? `<ol class="work">${item.work.map((s) => `<li>${fixLetters(s, item)}</li>`).join("")}</ol>` : ""}
+        ${!ok && item.miss ? `<p class="why">${fixLetters(item.miss, item)}</p>` : ""}
         <div class="check-wrap two-btns">
           <button class="btn btn-ghost" id="ask-btn" type="button">Ask about this</button>
           <button class="btn btn-primary" id="next-btn" type="button">${session.index + 1 >= session.lesson.items.length ? "See results" : "Continue"}</button>
@@ -2036,7 +2081,16 @@ body {
   function renderSettings() {
     show("settings", `
       ${renderTop()}
-      <section class="splash">
+      <section class="splash settings-block">
+        <div class="kicker">Settings</div>
+        <h1>Practice</h1>
+        <label class="toggle-row" for="shuffle-toggle">
+          <input type="checkbox" id="shuffle-toggle" ${shuffleOn() ? "checked" : ""} />
+          <span class="toggle-ui" aria-hidden="true"></span>
+          <span class="toggle-copy"><strong>Shuffle answer choices</strong><span>Mix the A–D order each time a question is shown, so you learn the answer and not its position. Grading is unaffected.</span></span>
+        </label>
+      </section>
+      <section class="splash settings-block">
         <div class="kicker">Discussion</div>
         <h1>Ask-about-this</h1>
         <p class="lede">Every item already has an on-device tutor that stays on the keyed solution. To talk to Grok live, add an xAI API key and open the app over https (the PWA), not as a local file.</p>
@@ -2050,6 +2104,11 @@ body {
         </div>
       </section>
     `);
+    $("#shuffle-toggle").addEventListener("change", (e) => {
+      state.shuffle = !!e.target.checked; // new optional field in strata-fepe-v1 (missing = on)
+      save();
+      toast(state.shuffle ? "Answer choices will be shuffled." : "Answer choices stay in authored order.");
+    });
     $("#save-key").addEventListener("click", () => {
       const v = $("#xai-key").value.trim();
       if (v && !v.startsWith("•")) state.xaiKey = v;

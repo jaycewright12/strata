@@ -961,7 +961,7 @@
                 "Δσ′ = 1,081 − 1,318 = −237 psf → decreases ≈ 240 psf"
               ],
               explanation: "Total stress rose a little because more of the column is saturated. Pore pressure rose more. Effective stress fell. Heavier column, weaker skeleton.",
-              miss: "If you only look at total stress you will predict an increase and pick A."
+              miss: "If you only look at total stress you will predict an increase and pick “increases by 240 psf.”"
             },
             {
               id: "pe-s1-d",
@@ -983,7 +983,7 @@
                 "σ′v = 1,770 − 1,248 = 522 psf → 520 psf"
               ],
               explanation: "Artesian head is not capped at the ground surface. If you run hydrostatic from the ground (u = 15 × 62.4 = 936), you get the 830 psf trap and you miss a possible heave problem at the base of an excavation.",
-              miss: "D is total stress. C is essentially u. B is the ‘I ignored the extra 5 ft of head’ answer."
+              miss: "1,770 psf is total stress. 1,250 psf is essentially u. 830 psf is the ‘I ignored the extra 5 ft of head’ answer."
             },
             {
               id: "pe-s1-e",
