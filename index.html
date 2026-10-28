@@ -1741,7 +1741,8 @@ body {
     const lesson = lessonById(id);
     if (!lesson) return renderHome();
     session = {
-      lesson,
+      // Fresh question order every start (retakes feel new); shallow copy keeps the pack untouched.
+      lesson: { ...lesson, items: shuffle(lesson.items || []) },
       index: 0,
       correct: 0,
       answers: [],
@@ -1826,7 +1827,7 @@ body {
         id: "review",
         title: "Missed pile",
         xp: Math.min(20, items.length * 3),
-        items,
+        items: shuffle(items),
         summary: "Second look at the items that beat you."
       },
       index: 0,
