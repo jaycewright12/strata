@@ -754,6 +754,81 @@ body {
   .tutor-head { flex-direction: column; }
 }
 
+
+/* PE topic syllabus */
+.topic {
+  margin: 18px 0 40px;
+  padding: 16px 14px 8px;
+  background: var(--card);
+  border: 1.5px solid var(--line);
+  border-radius: 22px;
+}
+.topic-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 12px;
+  margin-bottom: 10px;
+  padding: 0 4px;
+}
+.topic-head .kicker {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--water);
+  margin-bottom: 4px;
+}
+.topic-head h2 {
+  font-family: var(--font-display);
+  font-size: 24px;
+  letter-spacing: -0.03em;
+  font-weight: 600;
+  line-height: 1.15;
+}
+.topic-head p { color: var(--ink-soft); font-size: 13px; max-width: 36em; margin-top: 4px; }
+.topic .unit { margin: 8px 0 16px; padding: 0 4px; }
+.topic .unit-head h2 { font-size: 18px; }
+.topic .unit-head p { font-size: 13px; }
+.track-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin: 10px 4px 0;
+}
+.track-label.bench { color: #a66b2b; }
+.empty-shell {
+  margin: 8px 4px 14px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  border: 1.5px dashed var(--line);
+  color: var(--ink-soft);
+  font-size: 14px;
+  background: #faf6ee;
+}
+.all-topics {
+  margin: 8px 0 28px;
+  padding: 20px 18px;
+  background: linear-gradient(135deg, #1f4d3a 0%, #2a6b4f 60%, #3d7a5c 100%);
+  color: #f3eee4;
+  border-radius: 22px;
+}
+.all-topics .kicker { color: #b8e0c8; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.all-topics h2 {
+  font-family: var(--font-display);
+  font-size: 28px;
+  letter-spacing: -0.03em;
+  margin: 6px 0 8px;
+}
+.all-topics p { color: #d5e8dc; font-size: 15px; max-width: 38em; line-height: 1.4; margin-bottom: 14px; }
+.all-topics .btn-primary {
+  background: #f3eee4;
+  color: #1f4d3a;
+  border-color: #f3eee4;
+}
+.topic.bench-unit .node-orb, .topic .bench-unit .node-orb { border-color: #1b1712; }
   </style>
 </head>
 <body>
@@ -1009,7 +1084,7 @@ body {
         if (!isStr(u.id) || !ID_RE.test(u.id)) { rejected.push({ where: uw, reason: "missing/invalid unit id" }); return; }
         if (reg.unitIds.has(u.id) || seenU.has(u.id)) { rejected.push({ where: uw, reason: "unit id already exists" }); return; }
         if (!isStr(u.title)) { rejected.push({ where: uw, reason: "missing unit title" }); return; }
-        if (!Array.isArray(u.lessons) || !u.lessons.length) { rejected.push({ where: uw, reason: "no lessons" }); return; }
+        if (!Array.isArray(u.lessons)) { rejected.push({ where: uw, reason: "lessons must be an array" }); return; }
         const lessons = [];
         u.lessons.forEach((l, li) => {
           const lw = uw + " › lesson " + (l && l.id ? l.id : "#" + (li + 1));
@@ -1082,11 +1157,17 @@ body {
           seenL.add(l.id);
           lessons.push(lo);
         });
-        if (!lessons.length) { rejected.push({ where: uw, reason: "no valid lessons left" }); return; }
+        if (!lessons.length && u.lessons.length) { rejected.push({ where: uw, reason: "no valid lessons left" }); return; }
+        /* empty lessons[] = syllabus shell (Coming soon) */
         const uo = trusted ? { ...u } : { id: u.id };
         uo.title = T(u.title);
         uo.blurb = u.blurb == null ? "" : T(u.blurb);
         if (u.bench != null) uo.bench = u.bench === true;
+        if (u.topic != null) {
+          const tn = Number(u.topic);
+          if (isFinite(tn) && tn >= 1 && tn <= 10) uo.topic = tn;
+          else warnings.push(uw + ": \"topic\" should be 1–10; ignored.");
+        }
         uo.lessons = lessons;
         seenU.add(u.id);
         units.push(uo);
@@ -1260,9 +1341,29 @@ body {
   let state = load();
   let session = null;
 
+  // NCEES PE Civil–Geotechnical knowledge areas (April 2024). Home always shows all 10.
+  const PE_TOPICS = [
+    { n: 1, title: "Site Characterization", blurb: "Desk study through groundwater: exploration, sampling, in situ tests, classification." },
+    { n: 2, title: "Soil Mechanics, Laboratory Testing, and Analysis", blurb: "Effective stress, strength, drainage, and lab/analysis judgment." },
+    { n: 3, title: "Construction Observation, Monitoring, QA/QC, and Safety", blurb: "Field observation, instrumentation, QA/QC, and construction safety." },
+    { n: 4, title: "Earthquake Engineering and Dynamic Loads", blurb: "Seismic hazard, liquefaction, and dynamic loading." },
+    { n: 5, title: "Earth Structures, Ground Improvement, and Pavement", blurb: "Embankments, slopes, ground improvement, and pavement subgrades." },
+    { n: 6, title: "Groundwater and Seepage", blurb: "Seepage, gradient, piping, heave, and drainage." },
+    { n: 7, title: "Problematic Soil and Rock Conditions", blurb: "Expansive, collapsible, organic, and other difficult geomaterials." },
+    { n: 8, title: "Retaining Structures", blurb: "Earth pressure and retaining-wall thrust." },
+    { n: 9, title: "Shallow Foundations", blurb: "Bearing capacity and settlement of footings." },
+    { n: 10, title: "Deep Foundations", blurb: "Piles, drilled shafts, capacity, and load testing." }
+  ];
+
   function load() {
     try {
-      return { ...defaultState(), ...JSON.parse(localStorage.getItem(KEY) || "{}") };
+      const s = { ...defaultState(), ...JSON.parse(localStorage.getItem(KEY) || "{}") };
+      // One-time lesson-id migration hook (v3 PE remap kept lesson ids; new ids need no remap).
+      if (!s._peTopicsV3) {
+        s._peTopicsV3 = 1;
+        // If a future remap renames lessons, map old→new here and rewrite s.completed.
+      }
+      return s;
     } catch {
       return defaultState();
     }
@@ -1314,14 +1415,14 @@ body {
   function pathLessons() {
     return flattenUnits(C.units.filter((u) => !u.bench));
   }
-  // Unlock chain: each pack's path units form their own chain (core keeps its original chain;
-  // an imported pack's first lesson is always open). Bench units are always unlocked.
+  // Unlock chain: within one conceptual unit, lessons unlock in order (first always open).
+  // Each PE topic unit is independent so the syllabus is browsable. Bench units are always unlocked.
   function unitChain(unit) {
-    const pid = unit._pack || "core";
-    return flattenUnits(C.units.filter((u) => !!u.bench === !!unit.bench && (u._pack || "core") === pid));
+    return flattenUnits([unit]);
   }
   function chainFor(lesson) {
-    return flattenUnits(C.units.filter((u) => !!u.bench === !!lesson.bench && (u._pack || "core") === (lesson.packId || "core")));
+    const u = C.units.find((x) => x.id === lesson.unitId);
+    return u ? flattenUnits([u]) : [];
   }
   function packTitle(pid) {
     const p = ((window.STRATA.lastBuild && window.STRATA.lastBuild.reg.packs) || []).find((x) => x.id === pid);
@@ -1408,9 +1509,9 @@ body {
     show("splash", `
       ${renderTop()}
       <section class="splash">
-        <div class="kicker">Conceptual practice · Civil FE &amp; PE</div>
+        <div class="kicker">PE Civil–Geotechnical · Conceptual + PE bench</div>
         <h1>See what the soil will do.</h1>
-        <p class="lede">Short items on effective stress, seepage, drainage, earth pressure, and footings — written to train judgment, not formula hunting.</p>
+        <p class="lede">NCEES PE Civil–Geotechnical topics — conceptual judgment and PE working-bench calculations, kept on separate tracks under the same syllabus.</p>
         <div class="pill-row">
           <span class="pill">6-minute lessons</span>
           <span class="pill">Hearts + streak</span>
@@ -1429,12 +1530,21 @@ body {
   function renderHome() {
     state.seenSplash = true;
     save();
-    const pathU = C.units.filter((u) => !u.bench);
-    const benchU = C.units.filter((u) => u.bench);
-    const renderUnit = (unit, list) => {
+
+    const renderUnitTrack = (unit, trackName) => {
+      if (!unit) {
+        return `<div class="empty-shell">${trackName}: Coming soon · 0 lessons</div>`;
+      }
+      const list = unitChain(unit);
       const pg = unitProgress(unit);
+      if (!unit.lessons.length) {
+        return `
+          <div class="track-label${unit.bench ? " bench" : ""}">${trackName}</div>
+          <div class="empty-shell">Coming soon · 0 lessons</div>
+        `;
+      }
       const nodes = unit.lessons.map((lesson) => {
-        const packed = { ...lesson, bench: !!unit.bench };
+        const packed = { ...lesson, bench: !!unit.bench, unitId: unit.id, packId: unit._pack || "core" };
         const idx = list.findIndex((l) => l.id === lesson.id);
         const done = state.completed.includes(lesson.id);
         const unlocked = isUnlocked(packed, idx, list);
@@ -1453,12 +1563,12 @@ body {
         `;
       }).join("");
       return `
+        <div class="track-label${unit.bench ? " bench" : ""}">${trackName}</div>
         <section class="unit${unit.bench ? " bench-unit" : ""}">
           <div class="unit-head">
             <div>
               ${unit._pack && unit._pack !== "core" ? `<span class="pack-tag">Pack · ${packTitle(unit._pack)}</span>` : ""}
-              <h2>${unit.title}</h2>
-              <p>${unit.blurb}</p>
+              <p>${unit.blurb || ""}</p>
             </div>
             <div class="progress-chip">${pg.done}/${pg.total}</div>
           </div>
@@ -1466,18 +1576,63 @@ body {
         </section>
       `;
     };
-    const unitsHtml = pathU.map((u) => renderUnit(u, unitChain(u))).join("") +
-      `<div class="bench-banner">
-         <div class="kicker">Break from the path</div>
-         <h2>PE working bench</h2>
-         <p>Most-nearly calculation items in the Civil Geotechnical PE voice. Always unlocked. Worked steps after each check. Aim for about six minutes an item.</p>
-       </div>` +
-      benchU.map((u) => renderUnit(u, unitChain(u))).join("");
 
-    const missedN = state.missed.filter((id) => findItem(id)).length; // ids of removed packs stay saved but are not counted
+    const topicsHtml = PE_TOPICS.map((t) => {
+      const pathU = C.units.filter((u) => u.topic === t.n && !u.bench);
+      const benchU = C.units.filter((u) => u.topic === t.n && u.bench);
+      // Prefer first unit of each track (packs may contribute)
+      const path = pathU[0] || null;
+      const bench = benchU[0] || null;
+      // If multiple packs contribute to same topic/track, render each
+      const pathTracks = pathU.length
+        ? pathU.map((u) => renderUnitTrack(u, "Conceptual")).join("")
+        : renderUnitTrack(null, "Conceptual");
+      const benchTracks = benchU.length
+        ? benchU.map((u) => renderUnitTrack(u, "PE Bench")).join("")
+        : renderUnitTrack(null, "PE Bench");
+      const nLessons = [...pathU, ...benchU].reduce((a, u) => a + u.lessons.length, 0);
+      return `
+        <section class="topic" data-topic="${t.n}">
+          <div class="topic-head">
+            <div>
+              <div class="kicker">PE topic ${t.n} of 10</div>
+              <h2>${t.title}</h2>
+              <p>${t.blurb}</p>
+            </div>
+            <div class="progress-chip">${nLessons ? nLessons + " lesson" + (nLessons === 1 ? "" : "s") : "Empty"}</div>
+          </div>
+          ${pathTracks}
+          ${benchTracks}
+        </section>
+      `;
+    }).join("");
+
+    const tagged = new Set(C.units.filter((u) => u.topic >= 1 && u.topic <= 10).map((u) => u.id));
+    const otherU = C.units.filter((u) => !tagged.has(u.id));
+    const otherHtml = otherU.length ? `
+      <section class="topic">
+        <div class="topic-head">
+          <div>
+            <div class="kicker">Imported / uncategorized</div>
+            <h2>Other packs</h2>
+            <p>Units without a PE topic number (1–10). Add "topic": N in the pack to place them in the syllabus.</p>
+          </div>
+        </div>
+        ${otherU.map((u) => renderUnitTrack(u, u.bench ? "PE Bench" : "Conceptual")).join("")}
+      </section>` : "";
+
+    const pathCount = pathLessons().length;
+    const missedN = state.missed.filter((id) => findItem(id)).length;
     show("home", `
       ${renderTop()}
-      ${unitsHtml}
+      <div class="all-topics">
+        <div class="kicker">Across the syllabus</div>
+        <h2>All Topics · Conceptual</h2>
+        <p>Mixed conceptual practice sampling every loaded conceptual lesson — no PE bench items. Hearts off so you can finish the set.${pathCount ? ` ${pathCount} conceptual lesson${pathCount === 1 ? "" : "s"} in the pool.` : ""}</p>
+        <button class="btn btn-primary" data-go="mixed" type="button" ${pathCount ? "" : "disabled"}>Start mixed conceptual set</button>
+      </div>
+      ${topicsHtml}
+      ${otherHtml}
       <div class="home-extra">
         <article class="panel">
           <h3>Missed pile</h3>
@@ -1488,11 +1643,6 @@ body {
           <h3>Pocket card</h3>
           <p>σ′ = σ − u, ic = γ′/γw, Ka–K0–Kp at 30°, drained vs undrained forks.</p>
           <button class="btn btn-ghost" data-go="reference" type="button">Open reference</button>
-        </article>
-        <article class="panel">
-          <h3>All-concept check</h3>
-          <p>Two items from every conceptual group — effective stress, seepage, drainage, earth pressure, footings. Hearts off.</p>
-          <button class="btn btn-primary" data-go="mixed" type="button">Start mixed set</button>
         </article>
       </div>
     `);
@@ -1580,10 +1730,10 @@ body {
     session = {
       lesson: {
         id: "mixed-concepts",
-        title: "All-concept check",
+        title: "All Topics · Conceptual",
         xp: 36,
         items: shuffle(picked),
-        summary: "Two items from every conceptual lesson. Hearts are off so you can finish the set."
+        summary: "Two items from every conceptual lesson across the PE syllabus. PE bench items are excluded. Hearts are off so you can finish the set."
       },
       index: 0,
       correct: 0,
