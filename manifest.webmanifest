@@ -1,7 +1,7 @@
 {
-  "name": "STRATA — FE/PE Geotech",
+  "name": "STRATA — PE Civil Geotechnical",
   "short_name": "STRATA",
-  "description": "Conceptual and PE-style geotechnical practice for the Civil FE and PE.",
+  "description": "Conceptual and PE-style geotechnical practice for the PE Civil: Geotechnical exam.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

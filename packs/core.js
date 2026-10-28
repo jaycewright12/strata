@@ -53,7 +53,7 @@
               ],
               "explanation": "Terzaghi’s principle: σ′ = σ − u. The water carries u; the mineral skeleton carries σ′. Strength, stiffness, and volume change track σ′, not σ.",
               "miss": "A common miss is to treat total stress as what the soil “feels.” Total stress is just the overburden. The contacts feel what is left after pore pressure is subtracted.",
-              "fepe": "FE/PE: if a stem gives γ, depth, and a water table, they are usually fishing for σ′ at a named elevation."
+              "fepe": "PE: if a stem gives γ, depth, and a water table, they are usually fishing for σ′ at a named elevation."
             },
             {
               "id": "es-1-b",
@@ -136,7 +136,7 @@
                   "text": "Total stress is zero above the WT"
                 }
               ],
-              "explanation": "In a coarse sand the capillary fringe is thin. Pore pressure above the WT is taken as zero for most FE/PE work, so effective stress equals total stress there. Fine silts and clays are a different story — they can hold suction.",
+              "explanation": "In a coarse sand the capillary fringe is thin. Pore pressure above the WT is taken as zero for most PE work, so effective stress equals total stress there. Fine silts and clays are a different story — they can hold suction.",
               "miss": "Negative pore pressure (suction) is real in fine soils. Clean coarse sand is the case where you usually ignore it."
             },
             {
@@ -170,7 +170,7 @@
               "id": "es-1-f",
               "type": "mcq",
               "label": "Notation",
-              "stem": "On the FE/PE, a prime on a stress (σ′ or p′) almost always signals that the value is:",
+              "stem": "On the PE, a prime on a stress (σ′ or p′) almost always signals that the value is:",
               "choices": [
                 {
                   "id": "a",
@@ -1413,7 +1413,7 @@
                   "text": "Increases by a factor of four"
                 }
               ],
-              "explanation": "Darcy: q = k i. k does not change just because you steepened the head drop. (Very high gradients in gravel can leave Darcy’s range — not the usual FE assumption.)",
+              "explanation": "Darcy: q = k i. k does not change just because you steepened the head drop. (Very high gradients in gravel can leave Darcy’s range — not the usual PE assumption.)",
               "miss": "k is not the flow rate. k is the slope of q versus i."
             },
             {
@@ -1657,7 +1657,7 @@
               "id": "ep-1-d",
               "type": "mcq",
               "label": "Rankine’s deal",
-              "stem": "Rankine theory, as used on the FE/PE, most nearly assumes:",
+              "stem": "Rankine theory, as used on the PE, most nearly assumes:",
               "choices": [
                 {
                   "id": "a",
