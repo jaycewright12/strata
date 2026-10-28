@@ -10,5 +10,13 @@
 self.STRATA_PACK_FILES = [
   "geo-pe-01-site-char.js",
   "geo-pe-02-soil-mech.js",
+  "geo-pe-03-construction.js",
+  "geo-pe-04-earthquake.js",
+  "geo-pe-05-earth-structures.js",
+  "geo-pe-06-groundwater.js",
+  "geo-pe-07-problematic.js",
+  "geo-pe-08-retaining.js",
+  "geo-pe-09-shallow.js",
+  "geo-pe-10-deep.js",
   "core.js"
 ];

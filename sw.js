@@ -5,7 +5,7 @@
  * - Everything else (icons): cache-first.
  * Bump CACHE when the precache list changes shape (old caches are deleted on activate). */
 importScripts("packs/index.js");
-const CACHE = "strata-v5";
+const CACHE = "strata-v6";
 const PACK_FILES = (Array.isArray(self.STRATA_PACK_FILES) ? self.STRATA_PACK_FILES : ["core.js"]).map((f) => "./packs/" + f);
 const ASSETS = [
   "./",

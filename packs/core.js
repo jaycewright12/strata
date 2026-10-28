@@ -1153,48 +1153,11 @@
       ]
     },
     {
-      "id": "pe-03-construction",
-      "title": "Construction Observation, Monitoring, QA/QC, and Safety",
-      "blurb": "Field observation, instrumentation, QA/QC, and construction safety on geotech projects.",
-      "topic": 3,
-      "lessons": []
-    },
-    {
-      "id": "pe-03-construction-bench",
-      "title": "PE bench · Construction Observation",
-      "bench": true,
-      "topic": 3,
-      "blurb": "Most-nearly calculation items for this PE topic. Always unlocked.",
-      "lessons": []
-    },
-    {
-      "id": "pe-04-earthquake",
-      "title": "Earthquake Engineering and Dynamic Loads",
-      "blurb": "Seismic hazard, liquefaction, and dynamic loading of soil and foundations.",
-      "topic": 4,
-      "lessons": []
-    },
-    {
-      "id": "pe-04-earthquake-bench",
-      "title": "PE bench · Earthquake Engineering",
-      "bench": true,
-      "topic": 4,
-      "blurb": "Most-nearly calculation items for this PE topic. Always unlocked.",
-      "lessons": []
-    },
-    {
-      "id": "pe-05-earth-structures",
-      "title": "Earth Structures, Ground Improvement, and Pavement",
-      "blurb": "Embankments, slopes, ground improvement, and pavement subgrades.",
-      "topic": 5,
-      "lessons": []
-    },
-    {
       "id": "pe-05-earth-structures-bench",
-      "title": "PE bench · Earth Structures",
+      "title": "Additional · PE bench slopes (core bank)",
       "bench": true,
       "topic": 5,
-      "blurb": "Slope stability and earth-structure calculations. Most-nearly items with worked steps.",
+      "blurb": "Core-bank slope FS calcs kept under Topic 5. Pack geo-pe-05 owns the primary PE bench path.",
       "lessons": [
         {
           "id": "pe-sl1",
@@ -1278,8 +1241,8 @@
     },
     {
       "id": "pe-06-groundwater",
-      "title": "Groundwater and Seepage",
-      "blurb": "Seepage, hydraulic gradient, piping, heave, and drainage — conceptual judgment.",
+      "title": "Additional · Groundwater & seepage (core bank)",
+      "blurb": "Core-bank lessons kept under Topic 6: seepage, gradient, piping, heave. Pack geo-pe-06 owns the primary Topic 6 path.",
       "topic": 6,
       "lessons": [
         {
@@ -1513,10 +1476,10 @@
     },
     {
       "id": "pe-06-groundwater-bench",
-      "title": "PE bench · Groundwater and Seepage",
+      "title": "Additional · PE bench groundwater (core bank)",
       "bench": true,
       "topic": 6,
-      "blurb": "Critical gradient and heave FS. Most-nearly items with worked steps.",
+      "blurb": "Core-bank PE calcs kept under Topic 6. Pack geo-pe-06 owns the primary PE bench path.",
       "lessons": [
         {
           "id": "pe-w1",
@@ -1596,24 +1559,9 @@
       ]
     },
     {
-      "id": "pe-07-problematic",
-      "title": "Problematic Soil and Rock Conditions",
-      "blurb": "Expansive, collapsible, organic, and other difficult geomaterials.",
-      "topic": 7,
-      "lessons": []
-    },
-    {
-      "id": "pe-07-problematic-bench",
-      "title": "PE bench · Problematic Soil and Rock",
-      "bench": true,
-      "topic": 7,
-      "blurb": "Most-nearly calculation items for this PE topic. Always unlocked.",
-      "lessons": []
-    },
-    {
       "id": "pe-08-retaining",
-      "title": "Retaining Structures",
-      "blurb": "Earth pressure K0/Ka/Kp and wall thrust — conceptual judgment.",
+      "title": "Additional · Retaining (core bank)",
+      "blurb": "Core-bank lessons kept under Topic 8: earth pressure K0/Ka/Kp and wall thrust. Pack geo-pe-08 owns the primary Topic 8 path.",
       "topic": 8,
       "lessons": [
         {
@@ -1846,10 +1794,10 @@
     },
     {
       "id": "pe-08-retaining-bench",
-      "title": "PE bench · Retaining Structures",
+      "title": "Additional · PE bench retaining (core bank)",
       "bench": true,
       "topic": 8,
-      "blurb": "Active, at-rest, and water thrust calculations. Most-nearly items with worked steps.",
+      "blurb": "Core-bank PE calcs kept under Topic 8. Pack geo-pe-08 owns the primary PE bench path.",
       "lessons": [
         {
           "id": "pe-f1",
@@ -2001,8 +1949,8 @@
     },
     {
       "id": "pe-09-shallow",
-      "title": "Shallow Foundations",
-      "blurb": "Bearing capacity and settlement concepts for footings.",
+      "title": "Additional · Shallow foundations (core bank)",
+      "blurb": "Core-bank lessons kept under Topic 9: bearing capacity and settlement. Pack geo-pe-09 owns the primary Topic 9 path.",
       "topic": 9,
       "lessons": [
         {
@@ -2234,10 +2182,10 @@
     },
     {
       "id": "pe-09-shallow-bench",
-      "title": "PE bench · Shallow Foundations",
+      "title": "Additional · PE bench shallow (core bank)",
       "bench": true,
       "topic": 9,
-      "blurb": "Bearing capacity and consolidation settlement. Most-nearly items with worked steps.",
+      "blurb": "Core-bank PE calcs kept under Topic 9. Pack geo-pe-09 owns the primary PE bench path.",
       "lessons": [
         {
           "id": "pe-fd1",
@@ -2354,21 +2302,6 @@
           ]
         }
       ]
-    },
-    {
-      "id": "pe-10-deep",
-      "title": "Deep Foundations",
-      "blurb": "Piles, drilled shafts, capacity, and load testing.",
-      "topic": 10,
-      "lessons": []
-    },
-    {
-      "id": "pe-10-deep-bench",
-      "title": "PE bench · Deep Foundations",
-      "bench": true,
-      "topic": 10,
-      "blurb": "Most-nearly calculation items for this PE topic. Always unlocked.",
-      "lessons": []
     }
   ],
   "reference": [

@@ -32,11 +32,25 @@ Empty topics: a unit may have `"lessons": []` (syllabus shell → “Coming soon
 
 | File | Pack id | Topics |
 |---|---|---|
-| `core.js` | `core` | 2–10 (shells + remapped legacy bank; Topic 2 additional lessons) |
 | `geo-pe-01-site-char.js` | `geo-pe-01-site-char` | 1 Site Characterization |
 | `geo-pe-02-soil-mech.js` | `geo-pe-02-soil-mech` | 2 Soil Mechanics, Lab Testing & Analysis |
+| `geo-pe-03-construction.js` | `geo-pe-03-construction` | 3 Construction Observation, Monitoring, QA/QC, and Safety |
+| `geo-pe-04-earthquake.js` | `geo-pe-04-earthquake` | 4 Earthquake Engineering and Dynamic Loads |
+| `geo-pe-05-earth-structures.js` | `geo-pe-05-earth-structures` | 5 Earth Structures, Ground Improvement, and Pavement |
+| `geo-pe-06-groundwater.js` | `geo-pe-06-groundwater` | 6 Groundwater and Seepage |
+| `geo-pe-07-problematic.js` | `geo-pe-07-problematic` | 7 Problematic Soil and Rock Conditions |
+| `geo-pe-08-retaining.js` | `geo-pe-08-retaining` | 8 Retaining Structures |
+| `geo-pe-09-shallow.js` | `geo-pe-09-shallow` | 9 Shallow Foundations |
+| `geo-pe-10-deep.js` | `geo-pe-10-deep` | 10 Deep Foundations |
+| `core.js` | `core` | Remapped legacy bank kept as **Additional** under topics 2, 5 (bench), 6, 8, 9 (72 items). Empty Coming-soon shells removed where a GEO PE pack owns the topic. |
 
-List every built-in `.js` file in `packs/index.js` (also used by `sw.js` precache).
+List every built-in `.js` file in `packs/index.js` (also used by `sw.js` precache). Topic packs load before `core.js` so they own the primary Conceptual + PE Bench tracks.
+
+## Section scores (home)
+
+Optional `sectionStats` under `strata-fepe-v1` (never reshapes existing fields). Key `"1"`…`"10"` for each PE topic, and `"all"` for All Topics · Conceptual mixed runs.
+
+Each entry: `{ best, sum, n }` where a **run** is one finished lesson (Conceptual or PE Bench) in that section, and the run score is `correct / total` for that lesson. **Best** = max run score; **Average** = `sum / n`. Hearts are not used for gameplay (keys `hearts` / `heartTs` may still exist for old saves).
 
 ## Progress keys
 
