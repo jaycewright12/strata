@@ -829,6 +829,53 @@ body {
   border-color: #f3eee4;
 }
 .topic.bench-unit .node-orb, .topic .bench-unit .node-orb { border-color: #1b1712; }
+
+.section-scores {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.score-chip {
+  display: inline-flex;
+  flex-direction: column;
+  min-width: 72px;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: #f4efe6;
+  border: 1.5px solid var(--line);
+  line-height: 1.15;
+}
+.score-chip .score-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 3px;
+}
+.score-chip .score-val {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+}
+.score-chip.empty .score-val { color: var(--ink-soft); font-size: 16px; }
+.topic-head-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+.all-topics .section-scores { margin: 0 0 12px; }
+.all-topics .score-chip {
+  background: rgba(243,238,228,0.14);
+  border-color: rgba(243,238,228,0.28);
+}
+.all-topics .score-chip .score-label { color: #b8e0c8; }
+.all-topics .score-chip .score-val { color: #f3eee4; }
+.all-topics .score-chip.empty .score-val { color: #9bc4ad; }
   </style>
 </head>
 <body>
@@ -1327,6 +1374,7 @@ body {
 
   const defaultState = () => ({
     xp: 0,
+    // hearts / heartTs kept for old-save compatibility; gameplay no longer reads or writes them.
     hearts: MAX_HEARTS,
     heartTs: Date.now(),
     streak: 0,
@@ -1335,7 +1383,10 @@ body {
     missed: [],
     seenSplash: false,
     name: "",
-    xaiKey: ""
+    xaiKey: "",
+    // Optional: per-section run scores. Keys "1"…"10" and "all" (mixed conceptual).
+    // Each value { best, sum, n }; avg = sum/n. Score = correct/total for a finished lesson run.
+    sectionStats: {}
   });
 
   let state = load();
@@ -1361,6 +1412,8 @@ body {
       // Lesson-id migration hook: v3 PE remap kept existing lesson ids (es-*, sp-*, …, pe-s1, pe-w1, pe-f1).
       // New lessons (pe-s2, pe-sl1, pe-fd1) need no remap. If a future remap renames lessons, map
       // old→new here and rewrite s.completed before returning.
+      if (!s.sectionStats || typeof s.sectionStats !== "object") s.sectionStats = {};
+      // Hearts are ignored for gameplay (no regenerate / no gating). Keys stay for old saves.
       return s;
     } catch {
       return defaultState();
@@ -1371,16 +1424,43 @@ body {
   }
 
   function regenerateHearts() {
-    if (state.hearts >= MAX_HEARTS) {
-      state.heartTs = Date.now();
-      return;
+    /* no-op: heart system retired from gameplay; hearts/heartTs retained in storage only */
+  }
+
+  function sectionKeyForLesson(lesson) {
+    if (!lesson) return null;
+    if (lesson.id === "mixed-concepts") return "all";
+    if (lesson.id === "review") return null;
+    const u = C.units.find((x) => x.id === lesson.unitId);
+    if (u && u.topic >= 1 && u.topic <= 10) return String(u.topic);
+    return null;
+  }
+
+  function recordSectionScore(key, correct, total) {
+    if (!key || !total) return;
+    const pct = correct / total;
+    if (!state.sectionStats || typeof state.sectionStats !== "object") state.sectionStats = {};
+    const cur = state.sectionStats[key] || { best: 0, sum: 0, n: 0 };
+    cur.best = Math.max(Number(cur.best) || 0, pct);
+    cur.sum = (Number(cur.sum) || 0) + pct;
+    cur.n = (Number(cur.n) || 0) + 1;
+    state.sectionStats[key] = cur;
+  }
+
+  function sectionScoreHtml(key, dark) {
+    const s = (state.sectionStats && state.sectionStats[key]) || null;
+    if (!s || !s.n) {
+      return `<div class="section-scores" title="Finish a lesson in this section to record a score">
+        <div class="score-chip empty"><span class="score-label">Best</span><span class="score-val">—</span></div>
+        <div class="score-chip empty"><span class="score-label">Avg</span><span class="score-val">—</span></div>
+      </div>`;
     }
-    const gained = Math.floor((Date.now() - state.heartTs) / HEART_MS);
-    if (gained > 0) {
-      state.hearts = Math.min(MAX_HEARTS, state.hearts + gained);
-      state.heartTs += gained * HEART_MS;
-      save();
-    }
+    const pct = (v) => Math.round(v * 100) + "%";
+    const avg = s.sum / s.n;
+    return `<div class="section-scores" title="${s.n} finished run${s.n === 1 ? "" : "s"} (Conceptual + PE Bench lesson scores)">
+      <div class="score-chip"><span class="score-label">Best</span><span class="score-val">${pct(s.best)}</span></div>
+      <div class="score-chip"><span class="score-label">Avg</span><span class="score-val">${pct(avg)}</span></div>
+    </div>`;
   }
 
   function todayStr(d = new Date()) {
@@ -1448,7 +1528,6 @@ body {
   }
 
   function renderTop(extra = "") {
-    regenerateHearts();
     return `
       <header class="topbar">
         <button class="brand" data-go="home" type="button">
@@ -1465,7 +1544,6 @@ body {
         </button>
         <div class="stats">
           <div class="stat streak" title="Streak">🔥 <span>${state.streak}</span><span class="label"> streak</span></div>
-          <div class="stat hearts" title="Hearts">❤ <span>${state.hearts}</span></div>
           <div class="stat xp" title="XP">◆ <span>${state.xp}</span><span class="label"> XP</span></div>
           <button class="icon-btn gear" data-go="settings" type="button" title="Settings">⚙</button>
         </div>
@@ -1474,11 +1552,7 @@ body {
     `;
   }
 
-  // Refresh every visible heart counter in place (top bar + lesson bar) without re-rendering the screen.
-  function paintHearts() {
-    app.querySelectorAll(".topbar .stat.hearts span").forEach((el) => { el.textContent = state.hearts; });
-    app.querySelectorAll(".lesson-top .stat.hearts").forEach((el) => { el.textContent = "❤ " + state.hearts; });
-  }
+  function paintHearts() { /* no-op: hearts retired from UI */ }
 
   function show(name, html) {
     app.innerHTML = html;
@@ -1597,7 +1671,10 @@ body {
               <h2>${t.title}</h2>
               <p>${t.blurb}</p>
             </div>
-            <div class="progress-chip">${nLessons ? nLessons + " lesson" + (nLessons === 1 ? "" : "s") : "Empty"}</div>
+            <div class="topic-head-right">
+              <div class="progress-chip">${nLessons ? nLessons + " lesson" + (nLessons === 1 ? "" : "s") : "Empty"}</div>
+              ${sectionScoreHtml(String(t.n))}
+            </div>
           </div>
           ${pathTracks}
           ${benchTracks}
@@ -1626,7 +1703,8 @@ body {
       <div class="all-topics">
         <div class="kicker">Across the syllabus</div>
         <h2>All Topics · Conceptual</h2>
-        <p>Mixed conceptual practice sampling every loaded conceptual lesson — no PE bench items. Hearts off so you can finish the set.${pathCount ? ` ${pathCount} conceptual lesson${pathCount === 1 ? "" : "s"} in the pool.` : ""}</p>
+        <p>Mixed conceptual practice sampling every loaded conceptual lesson — no PE bench items.${pathCount ? ` ${pathCount} conceptual lesson${pathCount === 1 ? "" : "s"} in the pool.` : ""}</p>
+        ${sectionScoreHtml("all")}
         <button class="btn btn-primary" data-go="mixed" type="button" ${pathCount ? "" : "disabled"}>Start mixed conceptual set</button>
       </div>
       ${topicsHtml}
@@ -1660,10 +1738,8 @@ body {
   }
 
   function startLesson(id) {
-    regenerateHearts();
     const lesson = lessonById(id);
     if (!lesson) return renderHome();
-    if (state.hearts <= 0) return renderOutOfHearts();
     session = {
       lesson,
       index: 0,
@@ -1731,7 +1807,7 @@ body {
         title: "All Topics · Conceptual",
         xp: 36,
         items: shuffle(picked),
-        summary: "Two items from every conceptual lesson across the PE syllabus. PE bench items are excluded. Hearts are off so you can finish the set."
+        summary: "Two items from every conceptual lesson across the PE syllabus. PE bench items are excluded."
       },
       index: 0,
       correct: 0,
@@ -1770,20 +1846,8 @@ body {
   }
 
   function renderOutOfHearts() {
-    const mins = Math.max(1, Math.ceil((HEART_MS - ((Date.now() - state.heartTs) % HEART_MS)) / 60000));
-    show("hearts", `
-      ${renderTop()}
-      <div class="out-of-hearts">
-        <div class="medal" style="background:#c43c3c;color:#fff;box-shadow:0 10px 0 #8a2424">❤</div>
-        <h2>Heave warning</h2>
-        <p class="lede" style="margin:12px auto;max-width:22em">You are out of hearts. They refill with time — about one every 20 minutes — or come back tomorrow with a full set.</p>
-        <div class="cta-row" style="justify-content:center">
-          <button class="btn btn-primary" data-go="reference" type="button">Study the pocket card</button>
-          <button class="btn btn-ghost" data-go="home" type="button">Back to path</button>
-        </div>
-        <p class="fineprint" style="margin:18px auto">Next heart in roughly ${mins} min.</p>
-      </div>
-    `);
+    /* Hearts retired — never gate; send home if somehow called. */
+    return renderHome();
   }
 
   function renderQuestion() {
@@ -1797,7 +1861,7 @@ body {
       <div class="lesson-top">
         <button class="back-btn" data-go="home" type="button" aria-label="Back">←</button>
         <div class="track"><span style="width:${pct}%"></span></div>
-        <div class="stat hearts">❤ ${state.hearts}</div>
+        <div class="stat xp" title="Progress">${index + 1}/${lesson.items.length}</div>
       </div>
       <article class="prompt-card">
         <div class="q-label">${item.pe ? "PE working item" : (item.label || lesson.title)} · ${index + 1} / ${lesson.items.length}${item.pe ? " · ~6 min" : ""}</div>
@@ -1845,10 +1909,8 @@ body {
     session.answers.push({ id: item.id, ok });
     if (ok) session.correct += 1;
     else {
-      if (!session.examMode) state.hearts = Math.max(0, state.hearts - 1);
       if (!state.missed.includes(item.id)) state.missed.push(item.id);
       save();
-      paintHearts();
     }
     if (ok && session.reviewMode) {
       state.missed = state.missed.filter((id) => id !== item.id);
@@ -1875,9 +1937,6 @@ body {
       </div>
     `;
     $("#next-btn").addEventListener("click", () => {
-      if (!session.examMode && !ok && state.hearts <= 0 && session.index + 1 < session.lesson.items.length) {
-        return renderOutOfHearts();
-      }
       session.index += 1;
       session.locked = false;
       session.tutor = null;
@@ -1902,6 +1961,11 @@ body {
     if (correct === total && !already) gained += 8;
     state.xp += gained;
     if (!already && !session.reviewMode) state.completed.push(lesson.id);
+    // Record section score for finished runs (path lessons + mixed). Skip missed-pile review.
+    if (lesson.id !== "review") {
+      const sk = sectionKeyForLesson(lesson);
+      if (sk) recordSectionScore(sk, correct, total);
+    }
     const streaked = bumpStreak();
     save();
 
@@ -1940,7 +2004,7 @@ body {
       <section class="splash">
         <div class="kicker">Spaced second look</div>
         <h1>Missed pile</h1>
-        <p class="lede">${items.length} items. Same hearts rules. A correct answer pulls the item out of the pile.</p>
+        <p class="lede">${items.length} items. A correct answer pulls the item out of the pile.</p>
         <button class="btn btn-primary" id="start-review" type="button">Start review</button>
         <div class="item-list" style="margin-top:22px">
           ${items.map((it) => `<div class="miss-card"><strong>${it.stem}</strong><span style="color:var(--ink-soft);font-size:13px">${it.label || ""}</span></div>`).join("")}
@@ -2198,7 +2262,7 @@ body {
       <div class="lesson-top">
         <button class="back-btn" data-go="home" type="button" aria-label="Back">←</button>
         <div class="track"><span style="width:${Math.round(((session.index + 1) / session.lesson.items.length) * 100)}%"></span></div>
-        <div class="stat hearts">❤ ${state.hearts}</div>
+        <div class="stat xp" title="Progress">${session.index + 1}/${session.lesson.items.length}</div>
       </div>
       <article class="prompt-card">
         <div class="q-label">Answer recap · ${session.index + 1} / ${session.lesson.items.length}</div>
@@ -2225,7 +2289,6 @@ body {
     `);
     $("#ask-btn").addEventListener("click", renderTutor);
     $("#next-btn").addEventListener("click", () => {
-      if (!ok && state.hearts <= 0 && session.index + 1 < session.lesson.items.length) return renderOutOfHearts();
       session.index += 1;
       session.locked = false;
       session.tutor = null;
