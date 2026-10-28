@@ -16,8 +16,8 @@
   "units": [
     {
       "id": "pe-02-soil",
-      "title": "Soil Mechanics, Laboratory Testing, and Analysis",
-      "blurb": "Effective stress, phase relationships, stress–strain–strength, drained vs undrained, and permeability concepts.",
+      "title": "Additional · Effective stress & strength (core bank)",
+      "blurb": "Core-bank lessons kept under Topic 2: σ/u/σ′, water-table moves, checkpoint, drained vs undrained. Pack geo-pe-02 owns the primary Topic 2 path.",
       "topic": 2,
       "lessons": [
         {
@@ -886,10 +886,10 @@
     },
     {
       "id": "pe-02-soil-bench",
-      "title": "PE bench · Soil Mechanics",
+      "title": "Additional · PE bench numbers (core bank)",
       "bench": true,
       "topic": 2,
-      "blurb": "Stress profiles and strength calculations. Most-nearly items with worked steps.",
+      "blurb": "Core-bank PE calcs kept under Topic 2. Pack geo-pe-02 owns the primary PE bench path.",
       "lessons": [
         {
           "id": "pe-s1",

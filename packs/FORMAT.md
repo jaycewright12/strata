@@ -32,8 +32,9 @@ Empty topics: a unit may have `"lessons": []` (syllabus shell → “Coming soon
 
 | File | Pack id | Topics |
 |---|---|---|
-| `core.js` | `core` | 2–10 (shells + remapped legacy bank) |
+| `core.js` | `core` | 2–10 (shells + remapped legacy bank; Topic 2 additional lessons) |
 | `geo-pe-01-site-char.js` | `geo-pe-01-site-char` | 1 Site Characterization |
+| `geo-pe-02-soil-mech.js` | `geo-pe-02-soil-mech` | 2 Soil Mechanics, Lab Testing & Analysis |
 
 List every built-in `.js` file in `packs/index.js` (also used by `sw.js` precache).
 
