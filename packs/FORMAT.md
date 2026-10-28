@@ -42,9 +42,19 @@ Empty topics: a unit may have `"lessons": []` (syllabus shell → “Coming soon
 | `geo-pe-08-retaining.js` | `geo-pe-08-retaining` | 8 Retaining Structures |
 | `geo-pe-09-shallow.js` | `geo-pe-09-shallow` | 9 Shallow Foundations |
 | `geo-pe-10-deep.js` | `geo-pe-10-deep` | 10 Deep Foundations |
+| `geo-pe-01b-site-char.js` | `geo-pe-01b-site-char` | 1 Site Characterization (expansion) |
+| `geo-pe-02b-soil-mech.js` | `geo-pe-02b-soil-mech` | 2 Soil Mechanics (expansion) |
+| `geo-pe-03b-construction.js` | `geo-pe-03b-construction` | 3 Construction Observation (expansion) |
+| `geo-pe-04b-earthquake.js` | `geo-pe-04b-earthquake` | 4 Earthquake Engineering (expansion) |
+| `geo-pe-05b-earth-structures.js` | `geo-pe-05b-earth-structures` | 5 Earth Structures (expansion) |
+| `geo-pe-06b-groundwater.js` | `geo-pe-06b-groundwater` | 6 Groundwater & Seepage (expansion) |
+| `geo-pe-07b-problematic.js` | `geo-pe-07b-problematic` | 7 Problematic Soil & Rock (expansion) |
+| `geo-pe-08b-retaining.js` | `geo-pe-08b-retaining` | 8 Retaining Structures (expansion) |
+| `geo-pe-09b-shallow.js` | `geo-pe-09b-shallow` | 9 Shallow Foundations (expansion) |
+| `geo-pe-10b-deep.js` | `geo-pe-10b-deep` | 10 Deep Foundations (expansion) |
 | `core.js` | `core` | Remapped legacy bank kept as **Additional** under topics 2, 5 (bench), 6, 8, 9 (72 items). Empty Coming-soon shells removed where a GEO PE pack owns the topic. |
 
-List every built-in `.js` file in `packs/index.js` (also used by `sw.js` precache). Topic packs load before `core.js` so they own the primary Conceptual + PE Bench tracks.
+List every built-in `.js` file in `packs/index.js` (also used by `sw.js` precache). Topic packs (primary `geo-pe-01`…`10`, then expansion `geo-pe-01b`…`10b`) load before `core.js` so they own the Conceptual + PE Bench tracks.
 
 ## Section scores (home)
 
