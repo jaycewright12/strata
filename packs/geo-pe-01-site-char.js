@@ -1,5 +1,5 @@
 /*
- * STRATA built-in pack: GEO PE · 1. Site Characterization (v1.1.0)
+ * STRATA built-in pack: GEO PE · 1. Site Characterization (v1.2.0)
  * Personal use only. Original questions based on Jayce's study library
  * (NCEES handbook, FHWA GEC 5, NHI-06-088, UFC 3-220-10, ASCE/Vandevelde notes).
  * Do not redistribute.
@@ -10,7 +10,7 @@
   "format": "strata-pack",
   "id": "geo-pe-01-site-char",
   "title": "GEO PE · 1. Site Characterization",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Personal use only. Original questions based on Jayce's study library (NCEES handbook, FHWA GEC 5, NHI-06-088, UFC 3-220-10, ASCE/Vandevelde notes). Do not redistribute.",
   "units": [
     {
@@ -38,19 +38,19 @@
                 },
                 {
                   "id": "b",
-                  "text": "Laboratory Atterberg limits of the native clay can be read directly from the aerials, so no index testing is needed"
+                  "text": "Treat the filled pond as ordinary native ground once recent aerials show no standing water, so standard shallow warehouse boring depths apply"
                 },
                 {
                   "id": "c",
-                  "text": "RQD for NX core can be estimated from pond surface reflectance, replacing rock coring"
+                  "text": "Limit deeper exploration to the mapped pond outline only; lacustrine clay outside that footprint can be assumed competent without soft-soil penetration"
                 },
                 {
                   "id": "d",
-                  "text": "Fill age alone guarantees dense, well-compacted sand, so exploration may stop at 5 ft"
+                  "text": "Stop exploration when undocumented fill is first identified at shallow depth, because confirming fill presence is sufficient for settlement design"
                 }
               ],
-              "explanation": "NHI-06-088 Table 3-1: a series of aerials can show an area that was filled during the review period. Undocumented fill over soft lacustrine clay raises compressibility/settlement risk; NCEES §3.7.1 requires fully penetrating soft/unsuitable soils into competent material. Aerials do not yield Atterberg limits, RQD, or a free pass on exploration depth.",
-              "miss": "Aerials flag where fill/alteration occurred; they do not replace lab tests, rock core metrics, or depth rules for soft ground.",
+              "explanation": "NHI-06-088 Table 3-1: a series of aerials can show an area that was filled during the review period. Undocumented fill over soft lacustrine clay raises compressibility/settlement risk; NCEES §3.7.1 requires fully penetrating soft/unsuitable soils into competent material. Dry recent aerials do not erase soft-fill risk, and identifying fill without penetrating it does not satisfy depth rules.",
+              "miss": "Aerials flag where fill/alteration occurred; they do not waive soft-soil penetration into competent material or confine deep borings only to the pond outline.",
               "fepe": "Desk study first: historic fill zones get denser/deeper exploration, not shallower."
             },
             {
@@ -70,15 +70,15 @@
                 },
                 {
                   "id": "c",
-                  "text": "Supply CPT tip resistance qt for every depth at your abutment without any new soundings"
+                  "text": "Adopt the roadway SPT N-values and classifications as final abutment design parameters without site-specific confirmation borings"
                 },
                 {
                   "id": "d",
-                  "text": "Replace utility clearance and access assessment for the abutment footprint"
+                  "text": "Use the roadway groundwater notes as exact design piezometric heads at the abutment without new observation wells"
                 }
               ],
-              "explanation": "NHI-06-088 Table 3-1 (existing subsurface exploration reports): nearby prior work can supply geologic/hydrogeologic/geotechnical information and reduce exploration scope — it does not automatically eliminate project-specific borings under a new structure, invent CPT profiles you never ran, or replace utility/access checks.",
-              "miss": "Prior reports inform planning; they do not waive structure-specific exploration, CPT, or utility clearance.",
+              "explanation": "NHI-06-088 Table 3-1 (existing subsurface exploration reports): nearby prior work can supply geologic/hydrogeologic/geotechnical information and reduce exploration scope — it does not automatically eliminate project-specific borings under a new structure, allow adopting off-alignment N-values as final design parameters, or replace abutment-specific groundwater measurement.",
+              "miss": "Prior reports inform planning; they do not waive structure-specific borings, final design parameters, or piezometers at the abutment.",
               "fepe": "Use nearby reports to target borings — still confirm conditions at critical foundations."
             },
             {
@@ -102,10 +102,10 @@
                 },
                 {
                   "id": "d",
-                  "text": "Limit exploration to 10 ft into the soft silt regardless of embankment height"
+                  "text": "Stop at the shallow-foundation strip criterion 4B applied to embankment height H, ignoring the 2H / soft-strata override"
                 }
               ],
-              "explanation": "NCEES §3.7.1 embankment foundations: minimum depth is 2H unless a hard stratum is found sooner; if soft strata extend deeper than 2H, exploration must fully penetrate those soft strata into competent material. Here soft soils go to 95 ft > 2×35 = 70 ft, so stopping at 2H is insufficient.",
+              "explanation": "NCEES §3.7.1 embankment foundations: minimum depth is 2H unless a hard stratum is found sooner; if soft strata extend deeper than 2H, exploration must fully penetrate those soft strata into competent material. Here soft soils go to 95 ft > 2×35 = 70 ft, so stopping at 2H is insufficient. Shallow-foundation 4B rules are a different application.",
               "miss": "The 2H rule is a floor when soft ground is shallow; when soft ground is deeper than 2H, fully penetrate it — that is the classic PE trap.",
               "fepe": "Embankments: 2H baseline, but always finish soft soils into competent material."
             },
@@ -154,15 +154,15 @@
                 },
                 {
                   "id": "c",
-                  "text": "Bucket-auger boring in running sands without casing"
+                  "text": "Solid-stem continuous-flight auger advanced below the water table without casing, leaving an unsupported open hole for SPT"
                 },
                 {
                   "id": "d",
-                  "text": "Single-tube rock coring with diamond bit as the soil sampler"
+                  "text": "Mud rotary without a hollow stem or temporary casing, then attempt thin-walled sampling through an unstable hole in caving sand"
                 }
               ],
-              "explanation": "NHI-06-088 Table 3-4(a): hollow-stem auger is typically used in soils that would require casing to maintain an open hole for sampling. Wash boring should not be used above the water table when undisturbed samples are desired; bucket augers are not applicable in running sands; rock-core barrels are for rock, not routine soil SPT/Shelby work.",
-              "miss": "Match method to ground: caving soils → HSA/casing; do not pick wash/bucket/rock tools for this SPT/Shelby program.",
+              "explanation": "NHI-06-088 Table 3-4(a): hollow-stem auger is typically used in soils that would require casing to maintain an open hole for sampling. Wash boring should not be used above the water table when undisturbed samples are desired; solid-stem augers do not support the hole like HSA/casing in caving ground; mud rotary without casing still leaves a poor path for quality SPT/Shelby in running sand.",
+              "miss": "Match method to ground: caving soils below WT → HSA (or casing); solid-stem open hole and unsupported mud holes are poor primary choices here.",
               "fepe": "Caving soils below WT → hollow-stem (or casing) for SPT/Shelby."
             },
             {
@@ -173,24 +173,24 @@
               "choices": [
                 {
                   "id": "a",
-                  "text": "SPT only at 5-ft intervals, treating Nmeas as a continuous pore-pressure record"
+                  "text": "SPT only at 5-ft intervals, treating N<sub>meas</sub> as a continuous pore-pressure record"
                 },
                 {
                   "id": "b",
-                  "text": "CPTu (piezocone) soundings for qt, fs, and u2, with separate borings where samples are required",
+                  "text": "CPTu (piezocone) soundings for qt, fs, and u<sub>2</sub>, with separate borings where samples are required",
                   "correct": true
                 },
                 {
                   "id": "c",
-                  "text": "Seismic refraction alone, because it recovers undisturbed Shelby tubes"
+                  "text": "Standard CPT without pore-pressure sensors (qt and fs only), assuming thin drainage layers can be mapped from tip resistance alone"
                 },
                 {
                   "id": "d",
-                  "text": "Open test pits to 80 ft depth as the only exploration method"
+                  "text": "Widely spaced borings with intermittent SPT only, accepting that thin sand seams between sample intervals may be missed"
                 }
               ],
-              "explanation": "UFC 3-220-10 §2-7.2: CPT/CPTu pushes an instrumented cone for continuous tip and sleeve resistance; CPTu adds pore pressure (commonly u2). CPT does not produce a borehole, samples, or cuttings — so companion borings are still required for lab work. SPT is discontinuous; seismic refraction does not sample; deep test pits are impractical/unsafe as the sole method.",
-              "miss": "CPT maps stratigraphy continuously but never replaces sampling borings when lab data are needed.",
+              "explanation": "UFC 3-220-10 §2-7.2: CPT/CPTu pushes an instrumented cone for continuous tip and sleeve resistance; CPTu adds pore pressure (commonly u<sub>2</sub>), which is especially useful for detecting thin drainage layers. CPT does not produce a borehole, samples, or cuttings — so companion borings are still required for lab work. SPT is discontinuous; CPT without u misses the pore-pressure signature the team wants.",
+              "miss": "Need continuous qt/fs/u<sub>2</sub> → CPTu, then companion borings for samples. SPT spacing and CPT without u are near-misses for thin drainage mapping.",
               "fepe": "CPTu = qt + fs + u; no samples — plan companion borings."
             },
             {
@@ -214,11 +214,11 @@
                 },
                 {
                   "id": "d",
-                  "text": "Use NX rock core and compute RQD as a substitute for undrained strength"
+                  "text": "Drive a thick-walled ring-lined / California-type sampler and treat it as equivalent to a pushed Shelby for UU/CU"
                 }
               ],
-              "explanation": "NHI-06-088 Shelby/ASTM D1587 guidance and UFC §2-6: thin-walled tubes are pushed rapidly and steadily in cohesive fine-grained soils. Hammering increases disturbance; split-barrel SPT samples are disturbed by definition; Shelby is unsuitable in hard/dense/gravelly soils; RQD is a rock-mass index, not a clay strength test.",
-              "miss": "Undisturbed clay → push Shelby; SPT spoons and hammered tubes are disturbed.",
+              "explanation": "NHI-06-088 Shelby/ASTM D1587 guidance and UFC §2-6: thin-walled tubes are pushed rapidly and steadily in cohesive fine-grained soils. Hammering increases disturbance; split-barrel SPT samples are disturbed by definition; Shelby is unsuitable in hard/dense/gravelly soils; thick-walled driven tubes are more disturbed than pushed thin-wall and are not substitutes for UU/CU-quality undisturbed specimens.",
+              "miss": "Undisturbed clay → push Shelby; SPT spoons, hammered tubes, and thick-walled driven samplers are disturbed.",
               "fepe": "Shelby = smooth push in clay/silt; never hammer if you need undisturbed strength."
             },
             {
@@ -294,16 +294,16 @@
                 },
                 {
                   "id": "c",
-                  "text": "Proof that the cone recovered continuous Shelby-quality samples through the layer"
+                  "text": "A free-draining sand where any excess pore pressure would dissipate almost immediately when advancement pauses"
                 },
                 {
                   "id": "d",
-                  "text": "Confirmation that SPT N<sub>60</sub> equals qt in the same units without correlation"
+                  "text": "An overconsolidated dense sand, because only dense sands produce a sharp drop in tip resistance"
                 }
               ],
-              "explanation": "UFC §2-7.2: CPTu records qt, fs, and pore pressure (typically u2). Soft fine-grained layers show lower tip resistance and can develop significant excess pore pressure that dissipates slowly (low k). Clean sands/gravels tend toward drained response with little sustained excess u. CPT still recovers no samples; qt is not identically N<sub>60</sub>.",
-              "miss": "Sustained excess u2 + soft tip → clay/silt behavior, not free-draining gravel/sand, and not a sample recovery method.",
-              "fepe": "CPTu: slow u dissipation ≈ low-k fines; fast ≈ drained sand-like."
+              "explanation": "UFC §2-7.2: CPTu records qt, fs, and pore pressure (typically u<sub>2</sub>). Soft fine-grained layers show lower tip resistance and can develop significant excess pore pressure that dissipates slowly (low k). Clean sands/gravels tend toward drained response with little sustained excess u. A sharp tip drop with slowly dissipating excess u<sub>2</sub> is the opposite of free-draining sand behavior.",
+              "miss": "Sustained excess u<sub>2</sub> + soft tip → clay/silt behavior, not free-draining or dense sand.",
+              "fepe": "CPTu: low qt + high sustained Δu → fine-grained / low-k interval."
             },
             {
               "id": "gpe01-site-1-11",
@@ -326,12 +326,12 @@
                 },
                 {
                   "id": "d",
-                  "text": "SW (treat fines as irrelevant because some sand is present)"
+                  "text": "ML (call it silt with LL > 50 without checking that PI lies above the A-line)"
                 }
               ],
-              "explanation": "More than 50% passing No. 200 → fine-grained. A-line at LL = 54 is PI = 0.73(34) ≈ 24.8; measured PI = 28 lies above the A-line → clay. LL > 50 → fat clay CH. CL would need LL < 50; MH is silt (below A-line); SW is a clean-sand symbol.",
+              "explanation": "More than 50% passing No. 200 → fine-grained. A-line at LL = 54 is PI = 0.73(34) ≈ 24.8; measured PI = 28 lies above the A-line → clay. LL > 50 → fat clay CH. CL would need LL ≤ 50; MH/ML are silt symbols (below A-line).",
               "miss": "Fine-grained gate first (No. 200), then A-line (clay vs silt), then LL = 50 split (H vs L).",
-              "fepe": "Fines + above A-line + LL>50 → CH."
+              "fepe": "USCS fines: No.200 → A-line → LL 50 → CH/CL/MH/ML."
             },
             {
               "id": "gpe01-site-1-12",
@@ -378,16 +378,16 @@
                 },
                 {
                   "id": "c",
-                  "text": "RQD = 100% once any core is recovered from the run"
+                  "text": "RQD ≈ 58% by adding the soft 7 in weathered piece to the sound ≥ 4 in length ((28+7)/60)"
                 },
                 {
                   "id": "d",
                   "text": "RQD should include the soft 7 in piece and all fragments shorter than 4 in"
                 }
               ],
-              "explanation": "NCEES §3.7.4.1 / NHI-06-088: RQD = (sound pieces ≥ 4 in) / (run length) = 28/60 ≈ 47% → Poor (25–50%). Recovery = 45/60 = 75%. Soft/unsound pieces and pieces < 4 in are excluded from RQD even if recovered. Equating recovery to RQD is a classic PE trap.",
-              "miss": "Recovery counts everything recovered; RQD is stricter (sound + ≥4 in on centerline).",
-              "fepe": "Always separate recovery % from RQD %."
+              "explanation": "NCEES §3.7.4.1 / NHI-06-088: RQD = (sound pieces ≥ 4 in) / (run length) = 28/60 ≈ 47% → Poor (25–50%). Recovery = 45/60 = 75%. Soft/unsound pieces and pieces < 4 in are excluded from RQD even if recovered. Equating recovery to RQD, or adding soft length into the RQD numerator, are classic PE traps.",
+              "miss": "Recovery counts everything recovered; RQD is stricter (sound + ≥4 in on centerline). Soft length is not RQD.",
+              "fepe": "RQD ≠ recovery; exclude soft and <4 in pieces."
             },
             {
               "id": "gpe01-site-1-14",
@@ -410,12 +410,12 @@
                 },
                 {
                   "id": "d",
-                  "text": "Drill-fluid loss volume converted to an equivalent core length"
+                  "text": "Along a chord at mid-radius (halfway between the centerline and the outside edge)"
                 }
               ],
-              "explanation": "NCEES handbook figure (after FHWA): correct RQD length is measured along the core centerline and is independent of diameter. Tip-to-tip and “fully circular” methods are illustrated as incorrect because they make length depend on diameter. Fluid loss is logged separately.",
-              "miss": "Centerline — not tip-to-tip, not diameter-dependent circular projections.",
-              "fepe": "RQD lengths: centerline measure; drilling breaks that fit count as one piece."
+              "explanation": "NCEES handbook figure (after FHWA): correct RQD length is measured along the core centerline and is independent of diameter. Tip-to-tip and “fully circular” methods are illustrated as incorrect because they make length depend on diameter. A mid-radius chord is the same diameter-dependent error family.",
+              "miss": "Centerline — not tip-to-tip, not diameter-dependent circular or chord projections.",
+              "fepe": "RQD length = centerline; independent of NX diameter."
             },
             {
               "id": "gpe01-site-1-15",
@@ -438,12 +438,12 @@
                 },
                 {
                   "id": "d",
-                  "text": "Skip seals and sand packs; a dry borehole reading after 30 seconds equals both piezometric heads"
+                  "text": "Prefer a single nested boring with sand pack and bentonite seals regardless of the 8-ft vertical separation (ignore the ≤10 ft separate-boring rule)"
                 }
               ],
-              "explanation": "UFC 3-220-10 §2-8: open standpipe piezometers isolate a screened stratum with seals; nested piezometers in one boring need careful seals, but if measuring zones have about 10 ft or less of vertical separation, piezometers should be installed in separate borings. A full-length open well averages the highest head and short-circuits perched vs confined regimes. Sand pack + bentonite/surface seals prevent vertical short-circuiting and surface-water entry (NHI Fig. 3-35 practice).",
-              "miss": "Close vertical targets → separate borings; never rely on an unsealed open well to separate perched and confined heads.",
-              "fepe": "Perched vs confined: isolate screens; ≤10 ft apart → separate borings."
+              "explanation": "UFC 3-220-10 §2-8: open standpipe piezometers isolate a screened stratum with seals; nested piezometers in one boring need careful seals, but if measuring zones have about 10 ft or less of vertical separation, piezometers should be installed in separate borings. Here the aquitard is only 8 ft, so separate borings are preferred. A full-length open well averages heads; nesting without seals short-circuits zones; nesting with seals still violates the ≤10 ft separation guidance.",
+              "miss": "Close vertical targets (≤~10 ft) → separate borings; seals alone do not override that UFC rule.",
+              "fepe": "Nested piezos: seals matter; ≤10 ft vertical separation → separate holes."
             }
           ]
         }
@@ -523,17 +523,18 @@
                 },
                 {
                   "id": "d",
-                  "text": "100%"
+                  "text": "45%"
                 }
               ],
               "work": [
                 "Sound ≥ 4 in: 9 + 7 + 5 + 11 = 32 in",
                 "RQD = 32/60 = 0.533 ≈ 53%",
                 "Recovery = (32 + 6 + 8)/60 = 46/60 ≈ 77% (not RQD)",
-                "Including soft 6 in would give 38/60 ≈ 63% (incorrect)"
+                "Including soft 6 in would give 38/60 ≈ 63% (incorrect)",
+                "Omitting the 5 in piece → 27/60 = 45% (incorrect cutoff)"
               ],
-              "explanation": "Only hard/sound pieces ≥ 4 in count. Soft weathered length and short fragments are excluded. 77% is recovery; 63% wrongly adds the soft piece; 100% would require the entire run as sound ≥4 in pieces.",
-              "miss": "77% = recovery; 63% includes unsound core; exclude soft and <4 in pieces.",
+              "explanation": "Only hard/sound pieces ≥ 4 in count. Soft weathered length and short fragments are excluded. 77% is recovery; 63% wrongly adds the soft piece; 45% drops the 5 in piece as if a stricter length cutoff applied ((9+7+11)/60).",
+              "miss": "77% = recovery; 63% includes unsound core; 45% omits a valid ≥4 in piece. Exclude soft and <4 in only.",
               "fepe": "RQD numerator: sound AND ≥4 in. Recovery is a different number."
             },
             {
@@ -620,15 +621,15 @@
               "choices": [
                 {
                   "id": "a",
-                  "text": "One boring at each abutment only; stop all holes at 20 ft (= H)"
+                  "text": "One boring at each end of the embankment only; stop all holes at 20 ft (= H)"
                 },
                 {
                   "id": "b",
-                  "text": "Centerline borings every 2,000 ft is enough; depth may stop at 2H = 40 ft leaving 15 ft of soft clay"
+                  "text": "Centerline borings every 2,000 ft; depth may stop at 2H = 40 ft, leaving 15 ft of soft clay unexplored"
                 },
                 {
                   "id": "c",
-                  "text": "No transverse borings are ever needed if the alignment is straight"
+                  "text": "Centerline spacing 200–400 ft is enough; skip transverse borings at the critical section if the alignment is straight"
                 },
                 {
                   "id": "d",

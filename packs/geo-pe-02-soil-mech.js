@@ -1,5 +1,5 @@
 /*
- * STRATA built-in pack: GEO PE · 2. Soil Mechanics, Lab Testing & Analysis (v1.0.0)
+ * STRATA built-in pack: GEO PE · 2. Soil Mechanics, Lab Testing & Analysis (v1.1.0)
  * Personal use only. Original questions based on Jayce's study library
  * (NCEES PE Civil Reference Handbook Ch. 3.2–3.3 / 3.8–3.9, UFC 3-220-10,
  * FHWA NHI-06-088, Vandevelde Soil Mechanics, EM 1110-2-1902).
@@ -11,7 +11,7 @@
   "format": "strata-pack",
   "id": "geo-pe-02-soil-mech",
   "title": "GEO PE · 2. Soil Mechanics, Lab Testing & Analysis",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Personal use only. Original questions based on Jayce's study library (NCEES PE Civil Reference Handbook Ch. 3.2–3.3 / 3.8–3.9, UFC 3-220-10, FHWA NHI-06-088, Vandevelde Soil Mechanics, EM 1110-2-1902). Do not redistribute.",
   "units": [
     {
@@ -103,12 +103,12 @@
                 },
                 {
                   "id": "d",
-                  "text": "LI is undefined because Atterberg limits do not apply when w is between PL and LL"
+                  "text": "LI ≈ 0.27 by dividing (w − PL) by LL instead of by PI"
                 }
               ],
-              "explanation": "PI = LL − PL = 26; LI = (35 − 22)/26 = 0.5. NCEES §3.8.2 / NHI Table 2-4: 0 < LI < 1 → plastic phase with intermediate strength. LI ≥ 1 is liquid; LI ≤ 0 is semisolid/solid. Atterberg limits are specifically used to interpret natural water contents in that range.",
-              "miss": "Compute LI = (w−PL)/(LL−PL). Mid-range LI is plastic, not liquid or brittle solid.",
-              "fepe": "LI: ≥1 liquid, 0–1 plastic, ≤0 semisolid/solid."
+              "explanation": "PI = LL − PL = 26. LI = (w − PL)/PI = (35 − 22)/26 = 0.5. NCEES/NHI: 0 < LI < 1 is the plastic range between PL and LL. LI ≥ 1 would need w ≥ LL; LI ≤ 0 needs w ≤ PL. Dividing by LL instead of PI gives 13/48 ≈ 0.27 and mis-states the state.",
+              "miss": "LI = (w − PL)/PI with PI = LL − PL. Between PL and LL → plastic (0 < LI < 1).",
+              "fepe": "LI: <0 solid/semisolid; 0–1 plastic; >1 liquid."
             },
             {
               "id": "gpe02-soil-1-04",
@@ -126,7 +126,7 @@
                 },
                 {
                   "id": "c",
-                  "text": "Corrosion risk is controlled only by Atterberg limits; chemistry tests are not used for steel piles"
+                  "text": "Borderline risk because only chloride fails to exceed its UFC threshold, so overall aggressiveness may be discounted"
                 },
                 {
                   "id": "d",
@@ -134,9 +134,9 @@
                   "correct": true
                 }
               ],
-              "explanation": "UFC 3-220-10 lists high corrosion potential when resistivity < 2,000 ohm-cm, pH < 5.5, sulfate > 1,000 ppm, or chloride > 500 ppm (among other factors). Three independent flags are met here; a single “passing” chloride result does not clear the others. Atterberg limits do not replace electrochemical corrosivity tests (NCEES §3.8 index/corrosivity suite).",
-              "miss": "Any one of low resistivity, low pH, high sulfate, or high chloride can indicate aggressive soil — do not clear the site on chloride alone.",
-              "fepe": "UFC flags: ρ < 2,000 ohm-cm; pH < 5.5; SO4 > 1,000 ppm; Cl > 500 ppm."
+              "explanation": "UFC 3-220-10 corrosion-potential screening: ρ < 2,000 ohm-cm, pH < 5.5, sulfate > 1,000 ppm, and chloride > 500 ppm are separate aggressiveness flags. Here resistivity (1,200), pH (4.8), and sulfate (1,200) each exceed their thresholds — high corrosion potential — even though chloride (80) does not. One non-flagged test does not cancel the others; 1,000 ohm-cm is not the UFC resistivity cutoff.",
+              "miss": "Any one of the UFC flags can indicate aggressiveness; three flags are already exceeded here despite low chloride.",
+              "fepe": "UFC soil aggressiveness: ρ, pH, SO<sub>4</sub>, Cl — each can flag; do not require all four."
             },
             {
               "id": "gpe02-soil-1-05",
@@ -151,20 +151,20 @@
                 },
                 {
                   "id": "b",
-                  "text": "Liquid limit, plastic limit, and shrinkage limit only"
+                  "text": "Organic content, calcium carbonate content, and specific gravity only"
                 },
                 {
                   "id": "c",
-                  "text": "RQD, recovery, and weathering grade only"
+                  "text": "Grain-size distribution and Atterberg limits only"
                 },
                 {
                   "id": "d",
-                  "text": "Constant-head permeameter k and Hazen D10 only"
+                  "text": "Redox potential alone without pH, resistivity, sulfate, or chloride"
                 }
               ],
-              "explanation": "NCEES §3.8 index/performance tables (and NHI Table 5-1) list corrosivity (electrochemical) tests: pH, resistivity, sulfate, and chloride. Atterberg limits classify plasticity; RQD is rock; permeameter/Hazen address hydraulic conductivity — none of those replace the chemical suite for metal corrosion.",
-              "miss": "Corrosivity ≠ Atterberg, RQD, or permeability. Use pH + resistivity + SO4 + Cl.",
-              "fepe": "Buried metal: order pH, resistivity, sulfate, chloride."
+              "explanation": "NCEES §3.8 / NHI corrosivity testing suite for buried metals emphasizes pH, electrical resistivity, sulfate, and chloride. Organic/carbonate/Gs and grain-size/Atterberg packages are useful for classification and compressibility but are not the chemical/electrochemical aggressiveness suite. Redox alone is incomplete.",
+              "miss": "Corrosivity package = pH + resistivity + SO<sub>4</sub> + Cl — not index tests or Gs alone.",
+              "fepe": "Buried metal aggressiveness: pH, ρ, sulfate, chloride."
             },
             {
               "id": "gpe02-soil-1-06",
@@ -187,12 +187,12 @@
                 },
                 {
                   "id": "d",
-                  "text": "Doubles, because γsat is roughly twice γd"
+                  "text": "Is unchanged if the sand was already moist above the rising water table (confuses partial saturation with the submerged σ′ drop)"
                 }
               ],
-              "explanation": "When the WT rises through previously dry/moist soil, Δu = γw·z_sub while Δσ ≈ (γsat − γd)·z_sub = n·γw·z_sub < γw·z_sub. Thus σ′ = σ − u falls (Vandevelde / NCEES effective-stress principle). Total stress alone does not govern; σ and u do not move in lockstep for a WT rise into unsaturated soil.",
-              "miss": "WT rise into dry soil: u gains a full γw column; total stress gains only the water that fills voids — σ′ drops.",
-              "fepe": "Raising the WT reduces σ′ at a fixed depth below the new WT."
+              "explanation": "When the water table rises to the surface, pore pressure at a fixed depth increases by roughly γ<sub>w</sub>·Δh while total stress increases only by the difference between saturated and moist unit weights over the newly submerged height — so σ′ = σ − u decreases. Moist-above-WT conditions do not cancel that effective-stress drop once the soil is submerged.",
+              "miss": "WT rise to the surface reduces σ′ at fixed depth below grade — u climbs faster than σ.",
+              "fepe": "Raising WT → σ′ falls at a fixed depth (classic PE stress trap)."
             },
             {
               "id": "gpe02-soil-1-07",
@@ -286,24 +286,24 @@
               "choices": [
                 {
                   "id": "a",
-                  "text": "Drained effective-stress analysis with peak φ′ and c′ = 0 only, ignoring undrained su"
+                  "text": "Drained effective-stress analysis with peak φ′ and c′ = 0 only, ignoring undrained s<sub>u</sub>"
                 },
                 {
                   "id": "b",
-                  "text": "Undrained total-stress strength (e.g., UU / φ = 0 with su), because drainage cannot occur in the short term",
+                  "text": "Undrained total-stress strength (e.g., UU / φ = 0 with s<sub>u</sub>), because drainage cannot occur in the short term",
                   "correct": true
                 },
                 {
                   "id": "c",
-                  "text": "Residual drained φ′r along a preexisting slickenside as the only allowable short-term parameter"
+                  "text": "Residual drained φ′<sub>r</sub> along a preexisting slickenside as the only allowable short-term parameter"
                 },
                 {
                   "id": "d",
-                  "text": "Hazen permeability alone, substituting k for shear strength"
+                  "text": "Effective-stress c′, φ′ with construction pore pressures replaced by hydrostatic u only (misses undrained excess u)"
                 }
               ],
-              "explanation": "EM 1110-2-1902 / NCEES §3.3: undrained conditions → undrained strengths related to total stresses (su, often from UU or CU). Drained c′, φ′ apply when pore pressures dissipate (long-term). Residual φ′r is a different (often long-term/reactivation) issue; k is not a strength parameter.",
-              "miss": "Short-term saturated clay → undrained su (total stress). Save c′, φ′ for drained/long-term.",
+              "explanation": "EM 1110-2-1902 / NCEES §3.3: undrained conditions → undrained strengths related to total stresses (s<sub>u</sub>, often from UU or CU). Drained c′, φ′ apply when pore pressures dissipate (long-term). Using only hydrostatic u with c′, φ′ underestimates short-term undrained response when excess pore pressures develop. Residual φ′<sub>r</sub> is a different (often long-term/reactivation) issue.",
+              "miss": "Short-term saturated clay → undrained s<sub>u</sub> (total stress). Save c′, φ′ for drained/long-term with correct u.",
               "fepe": "Clay embankment EOC: undrained; long-term seepage: drained effective stress."
             },
             {
@@ -327,12 +327,12 @@
                 },
                 {
                   "id": "d",
-                  "text": "Constant-head rigid-wall permeameter"
+                  "text": "Consolidated-drained (CD) triaxial sheared slowly with no pore-pressure measurement"
                 }
               ],
-              "explanation": "NCEES §3.8 (NHI Table 5-3): CIUC consolidates with drainage, then shears undrained while measuring pore pressures — recommended to assess effective-stress strength parameters. UC and UU without u give undrained su approximations; a permeameter measures k, not c′/φ′.",
-              "miss": "Need c′, φ′ from clay with u measured → CIUC (CU with pore pressure), not UC/UU-only or permeability.",
-              "fepe": "CIUC (+u) → c′, φ′; UU/UC → su; CD → drained params slowly."
+              "explanation": "NCEES §3.8 (NHI Table 5-3): CIUC consolidates with drainage, then shears undrained while measuring pore pressures — recommended to assess effective-stress strength parameters. UC and UU without u give undrained s<sub>u</sub> approximations; CD can give drained c′, φ′ but is slow and does not use pore-pressure measurement during shear the way CIUC does for the handbook’s effective-stress recommendation.",
+              "miss": "Need c′, φ′ from clay with u measured → CIUC (CU with pore pressure), not UC/UU-only or CD-without-u.",
+              "fepe": "CIUC (+u) → c′, φ′; UU/UC → s<sub>u</sub>; CD → drained params slowly."
             },
             {
               "id": "gpe02-soil-1-12",
@@ -383,11 +383,11 @@
                 },
                 {
                   "id": "d",
-                  "text": "SPT spoon sample with no flow test, reporting N60 as permeability"
+                  "text": "Rigid-wall falling-head permeameter without backpressure saturation (sidewall leakage / incomplete saturation risk in clay)"
                 }
               ],
-              "explanation": "NCEES performance-testing table: flexible-wall permeameter is recommended for relatively low-permeability materials (k ≤ about 1×10⁻³ cm/s), clays and silts, with backpressure saturation. Rigid-wall devices are for higher-k sands/gravels and risk sidewall leakage in fines. SPT N is not k.",
-              "miss": "Clays/low k → flexible wall + backpressure. Sands/high k → rigid wall constant/falling head.",
+              "explanation": "NCEES performance-testing table: flexible-wall permeameter is recommended for relatively low-permeability materials (k ≤ about 1×10⁻³ cm/s), clays and silts, with backpressure saturation. Rigid-wall devices are for higher-k sands/gravels and risk sidewall leakage in fines; skipping backpressure leaves saturation incomplete for low-k clay.",
+              "miss": "Clays/low k → flexible wall + backpressure. Rigid-wall (even falling-head) is the near-miss wrong apparatus here.",
               "fepe": "Fine-grained k: flexible wall; granular k: rigid wall."
             },
             {
@@ -430,21 +430,21 @@
                 },
                 {
                   "id": "b",
-                  "text": "Accept the data and use γsat = (Gs + e)γw/(1+e) with S forced to 1.16 in all formulas"
+                  "text": "Accept the data and force S = 1.0 in γ<sub>sat</sub> formulas while leaving the reported w, e, and G<sub>s</sub> unchanged"
                 },
                 {
                   "id": "c",
-                  "text": "The measurements are inconsistent — S cannot exceed 1.0; recheck w, e, and/or Gs",
+                  "text": "The measurements are inconsistent — S cannot exceed 1.0; recheck w, e, and/or G<sub>s</sub>",
                   "correct": true
                 },
                 {
                   "id": "d",
-                  "text": "Replace Gs with 2.65×1.16 before any further phase calculations"
+                  "text": "Increase G<sub>s</sub> until S = 1.0 and proceed without retesting the specimen"
                 }
               ],
-              "explanation": "By definition S = Vw/Vv ≤ 1. NCEES/UFC phase relations: S = wGs/e. A computed S > 1 means at least one of w, e, or Gs is wrong (or units/ratios mixed). Do not “accept” S > 1 or invent a scaled Gs.",
-              "miss": "S > 100% is a lab/data error flag, not a physical state.",
-              "fepe": "Phase QA: if S = wGs/e > 1, reject/retest the inputs."
+              "explanation": "By definition S = V<sub>w</sub>/V<sub>v</sub> ≤ 1. NCEES/UFC phase relations: S = wG<sub>s</sub>/e. A computed S > 1 means at least one of w, e, or G<sub>s</sub> is wrong (or units/decimals mixed). Do not accept S > 1, silently force S = 1 while keeping bad inputs, or invent a scaled G<sub>s</sub>.",
+              "miss": "S > 100% is a lab/data error flag, not a physical state — recheck inputs.",
+              "fepe": "Phase QA: if S = wG<sub>s</sub>/e > 1, reject/retest the inputs."
             }
           ]
         }
