@@ -6,5 +6,6 @@
  * keep it plain (no DOM access).
  */
 self.STRATA_PACK_FILES = [
-  "core.js"
+  "core.js",
+  "geo-pe-01-site-char.js"
 ];
