@@ -1358,11 +1358,9 @@ body {
   function load() {
     try {
       const s = { ...defaultState(), ...JSON.parse(localStorage.getItem(KEY) || "{}") };
-      // One-time lesson-id migration hook (v3 PE remap kept lesson ids; new ids need no remap).
-      if (!s._peTopicsV3) {
-        s._peTopicsV3 = 1;
-        // If a future remap renames lessons, map old→new here and rewrite s.completed.
-      }
+      // Lesson-id migration hook: v3 PE remap kept existing lesson ids (es-*, sp-*, …, pe-s1, pe-w1, pe-f1).
+      // New lessons (pe-s2, pe-sl1, pe-fd1) need no remap. If a future remap renames lessons, map
+      // old→new here and rewrite s.completed before returning.
       return s;
     } catch {
       return defaultState();
