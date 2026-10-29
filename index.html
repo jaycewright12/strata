@@ -476,6 +476,8 @@ button:disabled { cursor: not-allowed; opacity: 0.55; }
   z-index: 30;
 }
 .sheet.open { transform: translateX(-50%) translateY(0); }
+.sheet { max-height: 85vh; max-height: 85dvh; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+.sheet p, .sheet .work li { white-space: pre-line; overflow-wrap: anywhere; }
 .sheet.good { background: #eef7f0; }
 .sheet.bad { background: #fdf2f0; }
 .sheet h3 { font-family: var(--font-display); font-size: 26px; margin-bottom: 6px; }
@@ -666,6 +668,8 @@ body {
   font-size: 14px;
 }
 .work li { margin: 4px 0; }
+.sol-pdf { margin: 8px 0; font-weight: 600; }
+.sol-pdf a { color: inherit; text-decoration: underline; }
 
   
   
@@ -1195,6 +1199,12 @@ body {
               out[k] = T(it[k]);
             });
             if (Array.isArray(it.work) && it.work.length) out.work = it.work.map(T);
+            delete out.solutionPdf;
+            if (it.solutionPdf != null && it.solutionPdf !== "") {
+              const sp = String(it.solutionPdf);
+              if (/^solutions\/[A-Za-z0-9_-][A-Za-z0-9._\/-]*\.pdf$/i.test(sp) && !/(^|\/)\.\.?(\/|$)/.test(sp) && !sp.includes("//")) out.solutionPdf = sp;
+              else warnings.push(iw + ": \"solutionPdf\" must be a relative path inside solutions/ ending in .pdf; ignored.");
+            }
             if (it.pe != null) out.pe = it.pe === true;
             delete out.fig;
             const figKey = resolveFig(iw, it.fig != null ? it.fig : mapFigs[it.id], it.id);
@@ -2049,6 +2059,7 @@ body {
       <h3>${ok ? "Solid." : "Not that one."}</h3>
       <p>${fixLetters(item.explanation, item)}</p>
       ${item.work && item.work.length ? `<ol class="work">${item.work.map((s) => `<li>${fixLetters(s, item)}</li>`).join("")}</ol>` : ""}
+      ${item.solutionPdf ? `<p class="sol-pdf"><a href="${encodeURI(item.solutionPdf)}" target="_blank" rel="noopener">Worked solution (PDF)</a></p>` : ""}
       ${!ok && item.miss ? `<p class="why">${fixLetters(item.miss, item)}</p>` : ""}
       ${item.fepe ? `<div class="fepe">${fixLetters(item.fepe, item)}</div>` : ""}
       <div class="check-wrap two-btns">
@@ -2400,6 +2411,7 @@ body {
         <h3>${ok ? "Solid." : "Not that one."}</h3>
         <p>${fixLetters(item.explanation, item)}</p>
         ${item.work && item.work.length ? `<ol class="work">${item.work.map((s) => `<li>${fixLetters(s, item)}</li>`).join("")}</ol>` : ""}
+      ${item.solutionPdf ? `<p class="sol-pdf"><a href="${encodeURI(item.solutionPdf)}" target="_blank" rel="noopener">Worked solution (PDF)</a></p>` : ""}
         ${!ok && item.miss ? `<p class="why">${fixLetters(item.miss, item)}</p>` : ""}
         <div class="check-wrap two-btns">
           <button class="btn btn-ghost" id="ask-btn" type="button">Ask about this</button>

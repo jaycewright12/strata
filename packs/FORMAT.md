@@ -52,9 +52,10 @@ Empty topics: a unit may have `"lessons": []` (syllabus shell → “Coming soon
 | `geo-pe-08b-retaining.js` | `geo-pe-08b-retaining` | 8 Retaining Structures (expansion) |
 | `geo-pe-09b-shallow.js` | `geo-pe-09b-shallow` | 9 Shallow Foundations (expansion) |
 | `geo-pe-10b-deep.js` | `geo-pe-10b-deep` | 10 Deep Foundations (expansion) |
+| `geo-pe-yt-calc-01.js` | `geo-pe-yt-calc-01` | Long Calculation Problems I: one PE bench unit per topic 1–10 (`gpeyt1-t1-bench`…`t10-bench`, 5 items each, 50 total); each item links a worked-solution PDF via `solutionPdf` (`solutions/yt-calc-01/`) |
 | `core.js` | `core` | Remapped legacy bank kept as **Additional** under topics 2, 5 (bench), 6, 8, 9 (72 items). Empty Coming-soon shells removed where a GEO PE pack owns the topic. |
 
-List every built-in `.js` file in `packs/index.js` (also used by `sw.js` precache). Topic packs (primary `geo-pe-01`…`10`, then expansion `geo-pe-01b`…`10b`) load before `core.js` so they own the Conceptual + PE Bench tracks.
+List every built-in `.js` file in `packs/index.js` (also used by `sw.js` precache). Topic packs (primary `geo-pe-01`…`10`, then expansion `geo-pe-01b`…`10b`, then `geo-pe-yt-calc-01`) load before `core.js` so they own the Conceptual + PE Bench tracks.
 
 ## Section scores (home)
 
@@ -78,3 +79,11 @@ has `"topic": N` (All Topics draws from topics 1–10). Recently served items ar
 allows. Lesson grouping inside conceptual units therefore matters less — it only drives the optional
 "Individual conceptual lessons" list. Set `topic` correctly on every unit; item ids must stay unique.
 Bench units (`"bench": true`) are still shown as lessons and are never mixed into sets.
+
+## Worked-solution PDFs (`solutionPdf`)
+
+Optional item field `solutionPdf`: a relative path inside `solutions/` ending in `.pdf`
+(e.g. `"solutions/yt-calc-01/gpeyt1-01-spt-n160.pdf"`). After Check (and in review) the sheet shows a
+**Worked solution (PDF)** link that opens in a new tab. The validator drops (with a warning) anything that is
+absolute, a URL, contains `..`/`.`/`//` segments, or is outside `solutions/`. PDFs are **not** precached by
+`sw.js`; they load on demand (needs network unless the browser cached them).

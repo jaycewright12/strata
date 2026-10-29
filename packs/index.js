@@ -28,5 +28,6 @@ self.STRATA_PACK_FILES = [
   "geo-pe-08b-retaining.js",
   "geo-pe-09b-shallow.js",
   "geo-pe-10b-deep.js",
+  "geo-pe-yt-calc-01.js",
   "core.js"
 ];
