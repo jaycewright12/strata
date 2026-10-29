@@ -69,3 +69,12 @@ localStorage `strata-fepe-v1`: keep field shapes. Prefer stable **item** ids (`m
 ## Mixed set
 
 **All Topics · Conceptual** (home top card) samples 2 items from every non-bench lesson of every loaded pack. PE bench items are never included.
+
+## How conceptual items are served (v12)
+
+The home screen shows the 10 PE topics as a grid. Conceptual (non-bench) items are served as random
+10-question sets per topic: a set for topic N draws from every conceptual item in every pack whose unit
+has `"topic": N` (All Topics draws from topics 1–10). Recently served items are skipped when the pool
+allows. Lesson grouping inside conceptual units therefore matters less — it only drives the optional
+"Individual conceptual lessons" list. Set `topic` correctly on every unit; item ids must stay unique.
+Bench units (`"bench": true`) are still shown as lessons and are never mixed into sets.

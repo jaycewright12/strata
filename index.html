@@ -828,6 +828,25 @@ body {
   color: #1f4d3a;
   border-color: #f3eee4;
 }
+/* Topic grid (2 rows x 5) */
+.topic-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin: 0 0 28px; }
+.topic-card {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 6px; text-align: left;
+  min-height: 118px; padding: 12px 12px 10px; background: var(--card); color: var(--ink);
+  border: 1.5px solid var(--line); border-radius: 18px; cursor: pointer; font: inherit;
+}
+.topic-card:hover { border-color: var(--ink); }
+.topic-card.open { border-color: var(--clay); box-shadow: 0 4px 0 var(--clay-deep); }
+.topic-card .tc-num { font-family: var(--font-display); font-size: 26px; font-weight: 600; color: var(--water); line-height: 1; }
+.topic-card.open .tc-num { color: var(--clay); }
+.topic-card .tc-name { font-size: 13px; font-weight: 700; line-height: 1.2; flex: 1; }
+.tc-score { font-size: 11px; color: var(--ink-soft); background: #f4efe6; border: 1px solid var(--line); border-radius: 999px; padding: 2px 8px; white-space: nowrap; }
+.topic-panel { grid-column: 1 / -1; margin: 2px 0 8px; }
+.topic-panel .topic { margin: 0; }
+.topic-panel .set-cta { margin: 4px 4px 14px; }
+.concept-list { margin: 6px 4px 14px; }
+.concept-list summary { cursor: pointer; font-size: 13px; font-weight: 700; color: var(--ink-soft); padding: 6px 0; }
+@media (max-width: 760px) { .topic-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .topic-card { min-height: 104px; } }
 .topic.bench-unit .node-orb, .topic .bench-unit .node-orb { border-color: #1b1712; }
 
 .section-scores {
@@ -1386,7 +1405,9 @@ body {
     xaiKey: "",
     // Optional: per-section run scores. Keys "1"…"10" and "all" (mixed conceptual).
     // Each value { best, sum, n }; avg = sum/n. Score = correct/total for a finished lesson run.
-    sectionStats: {}
+    sectionStats: {},
+    // Optional: recently served item ids per set key ("1"…"10", "all"), so the next set avoids repeats.
+    recentSet: {}
   });
 
   let state = load();
@@ -1394,16 +1415,16 @@ body {
 
   // NCEES PE Civil–Geotechnical knowledge areas (April 2024). Home always shows all 10.
   const PE_TOPICS = [
-    { n: 1, title: "Site Characterization", blurb: "Desk study through groundwater: exploration, sampling, in situ tests, classification." },
-    { n: 2, title: "Soil Mechanics, Laboratory Testing, and Analysis", blurb: "Effective stress, strength, drainage, and lab/analysis judgment." },
-    { n: 3, title: "Construction Observation, Monitoring, QA/QC, and Safety", blurb: "Field observation, instrumentation, QA/QC, and construction safety." },
-    { n: 4, title: "Earthquake Engineering and Dynamic Loads", blurb: "Seismic hazard, liquefaction, and dynamic loading." },
-    { n: 5, title: "Earth Structures, Ground Improvement, and Pavement", blurb: "Embankments, slopes, ground improvement, and pavement subgrades." },
-    { n: 6, title: "Groundwater and Seepage", blurb: "Seepage, gradient, piping, heave, and drainage." },
-    { n: 7, title: "Problematic Soil and Rock Conditions", blurb: "Expansive, collapsible, organic, and other difficult geomaterials." },
-    { n: 8, title: "Retaining Structures", blurb: "Earth pressure and retaining-wall thrust." },
-    { n: 9, title: "Shallow Foundations", blurb: "Bearing capacity and settlement of footings." },
-    { n: 10, title: "Deep Foundations", blurb: "Piles, drilled shafts, capacity, and load testing." }
+    { n: 1, title: "Site Characterization", short: "Site Characterization", blurb: "Desk study through groundwater: exploration, sampling, in situ tests, classification." },
+    { n: 2, title: "Soil Mechanics, Laboratory Testing, and Analysis", short: "Soil Mechanics & Lab", blurb: "Effective stress, strength, drainage, and lab/analysis judgment." },
+    { n: 3, title: "Construction Observation, Monitoring, QA/QC, and Safety", short: "Construction & QA/QC", blurb: "Field observation, instrumentation, QA/QC, and construction safety." },
+    { n: 4, title: "Earthquake Engineering and Dynamic Loads", short: "Earthquake & Dynamic", blurb: "Seismic hazard, liquefaction, and dynamic loading." },
+    { n: 5, title: "Earth Structures, Ground Improvement, and Pavement", short: "Earth Structures & Ground Imp.", blurb: "Embankments, slopes, ground improvement, and pavement subgrades." },
+    { n: 6, title: "Groundwater and Seepage", short: "Groundwater & Seepage", blurb: "Seepage, gradient, piping, heave, and drainage." },
+    { n: 7, title: "Problematic Soil and Rock Conditions", short: "Problematic Soil & Rock", blurb: "Expansive, collapsible, organic, and other difficult geomaterials." },
+    { n: 8, title: "Retaining Structures", short: "Retaining Structures", blurb: "Earth pressure and retaining-wall thrust." },
+    { n: 9, title: "Shallow Foundations", short: "Shallow Foundations", blurb: "Bearing capacity and settlement of footings." },
+    { n: 10, title: "Deep Foundations", short: "Deep Foundations", blurb: "Piles, drilled shafts, capacity, and load testing." }
   ];
 
   function load() {
@@ -1413,6 +1434,7 @@ body {
       // New lessons (pe-s2, pe-sl1, pe-fd1) need no remap. If a future remap renames lessons, map
       // old→new here and rewrite s.completed before returning.
       if (!s.sectionStats || typeof s.sectionStats !== "object") s.sectionStats = {};
+      if (!s.recentSet || typeof s.recentSet !== "object") s.recentSet = {};
       // Hearts are ignored for gameplay (no regenerate / no gating). Keys stay for old saves.
       return s;
     } catch {
@@ -1429,6 +1451,7 @@ body {
 
   function sectionKeyForLesson(lesson) {
     if (!lesson) return null;
+    if (lesson.setKey) return lesson.setKey;
     if (lesson.id === "mixed-concepts") return "all";
     if (lesson.id === "review") return null;
     const u = C.units.find((x) => x.id === lesson.unitId);
@@ -1647,43 +1670,58 @@ body {
       `;
     };
 
-    const topicsHtml = PE_TOPICS.map((t) => {
+    const conceptPool = (key) => conceptItems(key).length;
+    const chip = (key) => {
+      const st = (state.sectionStats && state.sectionStats[key]) || null;
+      if (!st || !st.n) return `<span class="tc-score">Best — · Avg —</span>`;
+      return `<span class="tc-score">Best ${Math.round(st.best * 100)}% · Avg ${Math.round((st.sum / st.n) * 100)}%</span>`;
+    };
+    const cardsHtml = PE_TOPICS.map((t) => `
+      <button class="topic-card${openTopic === t.n ? " open" : ""}" type="button" data-topic-card="${t.n}" aria-expanded="${openTopic === t.n}" title="${t.title}">
+        <span class="tc-num">${t.n}</span>
+        <span class="tc-name">${t.short || t.title}</span>
+        ${chip(String(t.n))}
+      </button>`).join("");
+    const panelHtml = (n) => {
+      const t = PE_TOPICS.find((x) => x.n === n);
+      if (!t) return "";
       const pathU = C.units.filter((u) => u.topic === t.n && !u.bench);
       const benchU = C.units.filter((u) => u.topic === t.n && u.bench);
-      // Prefer first unit of each track (packs may contribute)
-      const path = pathU[0] || null;
-      const bench = benchU[0] || null;
-      // If multiple packs contribute to same topic/track, render each
-      const pathTracks = pathU.length
-        ? pathU.map((u) => renderUnitTrack(u, "Conceptual")).join("")
-        : renderUnitTrack(null, "Conceptual");
+      const pool = conceptPool(String(t.n));
       const benchTracks = benchU.length
         ? benchU.map((u) => renderUnitTrack(u, "PE Bench")).join("")
         : renderUnitTrack(null, "PE Bench");
-      const nLessons = [...pathU, ...benchU].reduce((a, u) => a + u.lessons.length, 0);
+      const conceptLessons = pathU.length ? `
+        <details class="concept-list">
+          <summary>Individual conceptual lessons (${pathU.reduce((a, u) => a + u.lessons.length, 0)})</summary>
+          ${pathU.map((u) => renderUnitTrack(u, "Conceptual")).join("")}
+        </details>` : "";
       return `
-        <section class="topic" data-topic="${t.n}">
-          <div class="topic-head">
-            <div>
-              <div class="kicker">PE topic ${t.n} of 10</div>
-              <h2>${t.title}</h2>
-              <p>${t.blurb}</p>
+        <div class="topic-panel" id="topic-panel">
+          <section class="topic" data-topic="${t.n}">
+            <div class="topic-head">
+              <div>
+                <div class="kicker">PE topic ${t.n} of 10</div>
+                <h2>${t.title}</h2>
+                <p>${t.blurb}</p>
+              </div>
+              <div class="topic-head-right">${sectionScoreHtml(String(t.n))}</div>
             </div>
-            <div class="topic-head-right">
-              <div class="progress-chip">${nLessons ? nLessons + " lesson" + (nLessons === 1 ? "" : "s") : "Empty"}</div>
-              ${sectionScoreHtml(String(t.n))}
+            <div class="set-cta">
+              <button class="btn btn-primary" type="button" data-set="${t.n}" ${pool ? "" : "disabled"}>Start ${Math.min(SET_SIZE, pool) || SET_SIZE}-question set</button>
+              <p class="fineprint" style="margin-top:8px">${pool ? `Random conceptual items from a pool of ${pool}.` : "No conceptual items loaded for this topic yet."}</p>
             </div>
-          </div>
-          ${pathTracks}
-          ${benchTracks}
-        </section>
-      `;
-    }).join("");
+            ${benchTracks}
+            ${conceptLessons}
+          </section>
+        </div>`;
+    };
+    const topicsHtml = `<div class="topic-grid" id="topic-grid">${cardsHtml}</div>`;
 
     const tagged = new Set(C.units.filter((u) => u.topic >= 1 && u.topic <= 10).map((u) => u.id));
     const otherU = C.units.filter((u) => !tagged.has(u.id));
     const otherHtml = otherU.length ? `
-      <section class="topic">
+      <section class="topic home-other">
         <div class="topic-head">
           <div>
             <div class="kicker">Imported / uncategorized</div>
@@ -1694,16 +1732,16 @@ body {
         ${otherU.map((u) => renderUnitTrack(u, u.bench ? "PE Bench" : "Conceptual")).join("")}
       </section>` : "";
 
-    const pathCount = pathLessons().length;
+    const allPool = conceptPool("all");
     const missedN = state.missed.filter((id) => findItem(id)).length;
     show("home", `
       ${renderTop()}
       <div class="all-topics">
         <div class="kicker">Across the syllabus</div>
         <h2>All Topics · Conceptual</h2>
-        <p>Mixed conceptual practice sampling every loaded conceptual lesson — no PE bench items.${pathCount ? ` ${pathCount} conceptual lesson${pathCount === 1 ? "" : "s"} in the pool.` : ""}</p>
+        <p>A random ${SET_SIZE}-question conceptual set drawn from every PE topic — no PE bench items.${allPool ? ` ${allPool} conceptual items in the pool.` : ""}</p>
         ${sectionScoreHtml("all")}
-        <button class="btn btn-primary" data-go="mixed" type="button" ${pathCount ? "" : "disabled"}>Start mixed conceptual set</button>
+        <button class="btn btn-primary" data-go="mixed" type="button" ${allPool ? "" : "disabled"}>Start ${SET_SIZE}-question set</button>
       </div>
       ${topicsHtml}
       ${otherHtml}
@@ -1720,7 +1758,52 @@ body {
         </article>
       </div>
     `);
-    app.querySelectorAll("[data-lesson]").forEach((btn) => {
+    const grid = $("#topic-grid");
+    const placePanel = () => {
+      const old = $("#topic-panel");
+      if (old) old.remove();
+      app.querySelectorAll("[data-topic-card]").forEach((c) => {
+        const on = Number(c.getAttribute("data-topic-card")) === openTopic;
+        c.classList.toggle("open", on);
+        c.setAttribute("aria-expanded", String(on));
+      });
+      if (!openTopic || !grid) return;
+      const cards = [...grid.querySelectorAll("[data-topic-card]")];
+      const cols = Math.max(1, getComputedStyle(grid).gridTemplateColumns.split(" ").filter(Boolean).length);
+      const i = cards.findIndex((c) => Number(c.getAttribute("data-topic-card")) === openTopic);
+      if (i < 0) return;
+      const anchor = cards[Math.min(cards.length - 1, Math.ceil((i + 1) / cols) * cols - 1)];
+      anchor.insertAdjacentHTML("afterend", panelHtml(openTopic));
+      bindLessonButtons($("#topic-panel"));
+      const sb = app.querySelector("[data-set]");
+      if (sb) sb.addEventListener("click", () => startSet(sb.getAttribute("data-set")));
+    };
+    app.querySelectorAll("[data-topic-card]").forEach((c) => {
+      c.addEventListener("click", () => {
+        const n = Number(c.getAttribute("data-topic-card"));
+        openTopic = openTopic === n ? null : n;
+        placePanel();
+        const pnl = $("#topic-panel");
+        if (pnl && pnl.scrollIntoView) pnl.scrollIntoView({ block: "nearest", behavior: "smooth" });
+      });
+    });
+    placePanel();
+    lastCols = 0;
+    if (!homeResizeBound) {
+      homeResizeBound = true;
+      window.addEventListener("resize", () => {
+        const g = $("#topic-grid");
+        if (!g) return;
+        const cols = getComputedStyle(g).gridTemplateColumns.split(" ").filter(Boolean).length;
+        if (cols !== lastCols) { lastCols = cols; if (openTopic) renderHome(); }
+      });
+    }
+    bindLessonButtons(app.querySelector(".home-other"));
+  }
+
+  function bindLessonButtons(root) {
+    if (!root) return;
+    root.querySelectorAll("[data-lesson]").forEach((btn) => {
       btn.addEventListener("click", () => {
         const id = btn.getAttribute("data-lesson");
         const lesson = lessonById(id);
@@ -1793,20 +1876,57 @@ body {
       .replace(/\(([A-E])\)/g, (m, L) => "(" + remap(L) + ")");
   }
 
-  function startMixed() {
-    const picked = [];
-    pathLessons().forEach((lesson) => {
-      const pool = shuffle(lesson.items || []);
-      pool.slice(0, 2).forEach((it) => picked.push({ ...it, label: (lesson.title || it.label || "Concept") }));
+  // ---------- 10-question conceptual sets ----------
+  const SET_SIZE = 10;
+  let openTopic = null;
+  let lastCols = 0;
+  let homeResizeBound = false;
+  // Every non-bench item for a topic ("1"…"10") or across all topics ("all"), from every pack.
+  function conceptItems(key) {
+    const out = [];
+    const seen = new Set();
+    C.units.forEach((u) => {
+      if (u.bench) return;
+      const tn = Number(u.topic);
+      if (key === "all" ? !(tn >= 1 && tn <= 10) : tn !== Number(key)) return;
+      (u.lessons || []).forEach((l) => (l.items || []).forEach((it) => {
+        if (!it || seen.has(it.id)) return;
+        seen.add(it.id);
+        out.push({ ...it, label: it.label || l.title || "Concept", _pack: u._pack || "core" });
+      }));
     });
-    if (!picked.length) return renderHome();
+    return out;
+  }
+  function pickSet(key) {
+    const pool = conceptItems(key);
+    if (pool.length <= SET_SIZE) return shuffle(pool);
+    if (!state.recentSet || typeof state.recentSet !== "object") state.recentSet = {};
+    const recent = new Set(Array.isArray(state.recentSet[key]) ? state.recentSet[key] : []);
+    const fresh = shuffle(pool.filter((it) => !recent.has(it.id)));
+    const stale = shuffle(pool.filter((it) => recent.has(it.id)));
+    const picked = fresh.concat(stale).slice(0, SET_SIZE);
+    // Remember as many recent ids as still leaves a full fresh set next time.
+    const keep = Math.max(0, pool.length - SET_SIZE);
+    const prev = (state.recentSet[key] || []).filter((id) => !picked.some((p) => p.id === id));
+    state.recentSet[key] = picked.map((p) => p.id).concat(prev).slice(0, keep);
+    save();
+    return shuffle(picked);
+  }
+  function startSet(key) {
+    key = String(key);
+    const items = pickSet(key);
+    if (!items.length) return renderHome();
+    const t = PE_TOPICS.find((x) => String(x.n) === key);
     session = {
       lesson: {
-        id: "mixed-concepts",
-        title: "All Topics · Conceptual",
+        id: key === "all" ? "mixed-concepts" : "set-topic-" + key,
+        setKey: key,
+        title: key === "all" ? "All Topics · Conceptual" : `Topic ${key} · ${t ? t.short || t.title : ""}`,
         xp: 36,
-        items: shuffle(picked),
-        summary: "Two items from every conceptual lesson across the PE syllabus. PE bench items are excluded."
+        items,
+        summary: key === "all"
+          ? `${items.length} random conceptual items from across the PE syllabus. PE bench items are excluded.`
+          : `${items.length} random conceptual items for PE topic ${key}${t ? " (" + t.title + ")" : ""}.`
       },
       index: 0,
       correct: 0,
@@ -1816,6 +1936,7 @@ body {
     };
     renderQuestion();
   }
+  function startMixed() { return startSet("all"); }
 
   function startReview() {
     const items = state.missed.map(findItem).filter(Boolean);
